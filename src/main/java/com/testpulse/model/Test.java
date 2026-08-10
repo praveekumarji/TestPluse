@@ -1,9 +1,6 @@
 package com.testpulse.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,18 +11,36 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Test{
+public class Test {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
     private String title;
-    private String subject;;
+
+    @Column
+    private String titleHi;
+
+    @Column(nullable = false)
+    private String subject;
+
+    @Column
+    private String subjectHi;
+
+    @Column(nullable = false)
     private String description;
+
+    @Column
+    private String descriptionHi;
+
+    @Column
     private String durationMinutes;
-    private  Modes mode;
+
+    @Enumerated(EnumType.STRING)
+    private Modes mode;
+
+    @Enumerated(EnumType.STRING)
     private difficulty difficulty;
-
-
-
 }
