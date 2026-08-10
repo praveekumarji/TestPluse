@@ -43,4 +43,8 @@ public class Test {
 
     @Enumerated(EnumType.STRING)
     private difficulty difficulty;
+
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private TestType testType = TestType.FREE;
 }

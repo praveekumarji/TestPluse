@@ -1,0 +1,24 @@
+This file is intentionally left blank because a real Excel template should be generated with an application or spreadsheet tool. To create it locally, use the columns listed below.
+
+Columns:
+- testId
+- subject
+- subjectHi
+- topic
+- text
+- textHi
+- option1
+- option2
+- option3
+- option4
+- optionHi1
+- optionHi2
+- optionHi3
+- optionHi4
+- correctOptionIndex
+- explanation
+- explanationHi
+- hint
+
+Example row:
+1,Math,गणित,Algebra,What is 2 + 2?,2 + 2 किसके बराबर है?,3,4,5,6,3,4,5,6,1,Addition basics,जोड़ की मूल बातें,Think about counting

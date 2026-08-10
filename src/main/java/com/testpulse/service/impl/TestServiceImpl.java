@@ -3,6 +3,7 @@ package com.testpulse.service.impl;
 import com.testpulse.dto.CreateTestRequest;
 import com.testpulse.model.Modes;
 import com.testpulse.model.Test;
+import com.testpulse.model.TestType;
 import com.testpulse.model.difficulty;
 import com.testpulse.repository.TestRepository;
 import com.testpulse.service.TestService;
@@ -63,6 +64,7 @@ public class TestServiceImpl implements TestService {
                 .durationMinutes("30")
                 .mode(Modes.valueOf(normalizedMode))
                 .difficulty(difficulty.valueOf(normalizedDifficulty))
+                .testType(TestType.FREE)
                 .build();
 
         return applyLanguage(testRepository.save(test), lang);
@@ -116,6 +118,10 @@ public class TestServiceImpl implements TestService {
             throw new IllegalArgumentException("Test difficulty is required.");
         }
 
+        String normalizedTestType = request.getTestType() == null || request.getTestType().isBlank()
+                ? "FREE"
+                : request.getTestType().trim().toUpperCase(Locale.ROOT);
+
         return Test.builder()
                 .title(request.getTitle())
                 .titleHi(request.getTitleHi())
@@ -126,6 +132,7 @@ public class TestServiceImpl implements TestService {
                 .durationMinutes(request.getDurationMinutes())
                 .mode(Modes.valueOf(request.getMode().trim().toUpperCase(Locale.ROOT)))
                 .difficulty(difficulty.valueOf(request.getDifficulty().trim().toUpperCase(Locale.ROOT)))
+                .testType(TestType.valueOf(normalizedTestType))
                 .build();
     }
 

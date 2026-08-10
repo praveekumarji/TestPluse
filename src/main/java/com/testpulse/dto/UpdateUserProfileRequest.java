@@ -9,12 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateUserRequest {
+public class UpdateUserProfileRequest {
+    private String fullName;
     private String email;
     private String mobileNumber;
-    private String password;
-    private String fullName;
     private String preferredLanguage;
-    @Builder.Default
-    private String subscriptionStatus = "FREE";
 }

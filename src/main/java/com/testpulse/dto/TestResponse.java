@@ -17,4 +17,5 @@ public class TestResponse {
     private String durationMinutes;
     private String mode;
     private String difficulty;
+    private String testType;
 }

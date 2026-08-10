@@ -19,4 +19,6 @@ public class CreateTestRequest {
     private String durationMinutes;
     private String mode;
     private String difficulty;
+    @Builder.Default
+    private String testType = "FREE";
 }

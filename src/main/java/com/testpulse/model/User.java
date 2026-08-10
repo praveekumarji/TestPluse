@@ -15,8 +15,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String email;
+
+    @Column(nullable = false, unique = true)
+    private String mobileNumber;
 
     @Column(nullable = false)
     private String passwordHash;
@@ -29,4 +32,9 @@ public class User {
 
     @Column(nullable = false)
     private String preferredLanguage = "en";
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private SubscriptionStatus subscriptionStatus = SubscriptionStatus.FREE;
 }

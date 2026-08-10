@@ -10,6 +10,7 @@ import com.testpulse.service.QuestionService;
 import com.testpulse.service.TestService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -81,6 +82,16 @@ public class TestController {
         }
     }
 
+    @PostMapping("/upload-questions")
+    public ResponseEntity<?> uploadQuestionsFromExcel(@RequestParam("file") MultipartFile file) {
+        try {
+            List<Question> createdQuestions = questionService.importQuestionsFromExcel(file);
+            return ResponseEntity.ok(createdQuestions);
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @GetMapping("/test")
    public ResponseEntity<String> test(){
         return ResponseEntity.ok("TestController is working!");
@@ -99,6 +110,7 @@ public class TestController {
                 .durationMinutes(test.getDurationMinutes())
                 .mode(test.getMode() == null ? null : test.getMode().name())
                 .difficulty(test.getDifficulty() == null ? null : test.getDifficulty().name())
+                .testType(test.getTestType() == null ? null : test.getTestType().name())
                 .build();
     }
 
