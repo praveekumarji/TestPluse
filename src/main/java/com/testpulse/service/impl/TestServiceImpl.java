@@ -8,16 +8,13 @@ import com.testpulse.model.difficulty;
 import com.testpulse.repository.TestRepository;
 import com.testpulse.service.TestService;
 import com.testpulse.util.LocalizedTextResolver;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class TestServiceImpl implements TestService {
@@ -29,6 +26,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    @Cacheable(value = "tests", key = "'all:' + #subject + ':' + #searchQuery + ':' + #lang")
     public List<Test> getAllTests(String searchQuery, String subject, String lang) {
         List<Test> tests = (subject != null && !subject.isBlank())
                 ? testRepository.findBySubjectContainingIgnoreCase(subject)
@@ -39,36 +37,29 @@ public class TestServiceImpl implements TestService {
             tests = tests.stream()
                     .filter(test ->
                             (test.getTitle() != null && test.getTitle().toLowerCase(Locale.ROOT).contains(query)) ||
-                                    (test.getDescription() != null && test.getDescription().toLowerCase(Locale.ROOT).contains(query)) ||
-                                    (test.getTitleHi() != null && test.getTitleHi().toLowerCase(Locale.ROOT).contains(query)))
+                            (test.getDescription() != null && test.getDescription().toLowerCase(Locale.ROOT).contains(query)) ||
+                            (test.getTitleHi() != null && test.getTitleHi().toLowerCase(Locale.ROOT).contains(query)))
                     .toList();
         }
 
-        Long currentUserId = getCurrentUserId().orElse(null);
         return tests.stream()
                 .filter(Test::isActive)
-               .filter(test -> test.getOwnerUserId() == null || Objects.equals(test.getOwnerUserId(), currentUserId))
                 .map(test -> applyLanguage(test, lang))
                 .toList();
     }
 
     @Override
+    @Cacheable(value = "tests", key = "#id + ':' + #lang")
     public Test getTestById(Long id, String lang) {
-        Long currentUserId = getCurrentUserId().orElse(null);
         Test test = testRepository.findById(id)
                 .filter(Test::isActive)
-                .filter(t -> t.getOwnerUserId() == null || Objects.equals(t.getOwnerUserId(), currentUserId))
                 .orElseThrow(() -> new RuntimeException("Test not found"));
         return applyLanguage(test, lang);
     }
 
     @Override
-    public Test createCustomTest(String subject, int questionCount, String difficulty, String mode, String lang) {
-        return null;
-    }
-
-    //@Override
-    public Test createCustomTest(String subject, int questionCount, String difficultyLevel, String mode, String lang, Long ownerUserId) {
+    @CacheEvict(value = "tests", allEntries = true)
+    public Test createCustomTest(String subject, int questionCount, String difficultyLevel, String mode, String lang) {
         String normalizedSubject = subject == null ? "General" : subject.trim();
         String normalizedDifficulty = difficultyLevel == null || difficultyLevel.isBlank() ? "MEDIUM" : difficultyLevel.trim().toUpperCase(Locale.ROOT);
         String normalizedMode = mode == null || mode.isBlank() ? "PRACTICE" : mode.trim().toUpperCase(Locale.ROOT);
@@ -84,14 +75,13 @@ public class TestServiceImpl implements TestService {
                 .mode(Modes.valueOf(normalizedMode))
                 .difficulty(difficulty.valueOf(normalizedDifficulty))
                 .testType(TestType.PAID)
-                .ownerUserId(ownerUserId)
                 .build();
 
         return applyLanguage(testRepository.save(test), lang);
     }
 
-
     @Override
+    @CacheEvict(value = "tests", allEntries = true)
     public List<Test> addTest(List<Test> tests) {
         if (tests == null || tests.isEmpty()) {
             throw new IllegalArgumentException("At least one test is required.");
@@ -106,6 +96,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    @CacheEvict(value = "tests", allEntries = true)
     public List<Test> addTestsFromDto(List<CreateTestRequest> requests) {
         if (requests == null || requests.isEmpty()) {
             throw new IllegalArgumentException("At least one test is required.");
@@ -189,19 +180,6 @@ public class TestServiceImpl implements TestService {
         return test;
     }
 
-    private Optional<Long> getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
-            return Optional.empty();
-        }
-
-        try {
-            return Optional.of(Long.valueOf(authentication.getName()));
-        } catch (NumberFormatException ex) {
-            return Optional.empty();
-        }
-    }
-
     private String translateSubjectToHindi(String subject) {
         if (subject == null || subject.isBlank()) {
             return "सामान्य";
@@ -217,6 +195,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    @CacheEvict(value = "tests", allEntries = true)
     public Test updateTest(Long id, Test testUpdate) {
         Test existing = testRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Test not found"));
@@ -258,15 +237,11 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    @CacheEvict(value = "tests", allEntries = true)
     public void deactivateTest(Long id) {
         Test test = testRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Test not found"));
         test.setActive(false);
         testRepository.save(test);
     }
-
-   /* @Override
-    public void deleteTest(Long id) {
-
-    }*/
 }
