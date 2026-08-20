@@ -1,11 +1,14 @@
 package com.testpulse.controller;
 
+import com.testpulse.dto.CreateCustomTestRequest;
+import com.testpulse.dto.CustomTestResponse;
 import com.testpulse.dto.CreateQuestionRequest;
 import com.testpulse.dto.CreateTestRequest;
 import com.testpulse.dto.QuestionResponse;
 import com.testpulse.dto.TestResponse;
 import com.testpulse.model.Question;
 import com.testpulse.model.Test;
+import com.testpulse.service.CustomTestService;
 import com.testpulse.service.QuestionService;
 import com.testpulse.service.TestService;
 import org.springframework.http.ResponseEntity;
@@ -22,9 +25,12 @@ public class TestController {
 
     private final QuestionService questionService;
 
-    public TestController(TestService testService, QuestionService questionService) {
+    private final CustomTestService customTestService;
+
+    public TestController(TestService testService, QuestionService questionService, CustomTestService customTestService) {
         this.testService = testService;
         this.questionService = questionService;
+        this.customTestService = customTestService;
     }
 
     @GetMapping
@@ -45,13 +51,18 @@ public class TestController {
     }
 
     @PostMapping("/custom")
-    public ResponseEntity<Test> createCustomTest(@RequestParam String subject,
-                                               @RequestParam int questionCount,
-                                               @RequestParam String difficulty,
-                                               @RequestParam String mode,
-                                               @RequestParam(defaultValue = "en") String lang) {
-        Test test = testService.createCustomTest(subject, questionCount, difficulty, mode, lang);
-        return ResponseEntity.ok(test);
+    public ResponseEntity<CustomTestResponse> createCustomTest(@RequestParam String subject,
+                                                               @RequestParam String difficulty,
+                                                               @RequestParam String mode,
+                                                               @RequestParam(required = false) List<Long> questionIds,
+                                                               @RequestParam(defaultValue = "en") String lang) {
+        CreateCustomTestRequest request = CreateCustomTestRequest.builder()
+                .subject(subject)
+                .difficulty(difficulty)
+                .mode(mode)
+                .questionIds(questionIds)
+                .build();
+        return ResponseEntity.ok(customTestService.createCustomTest(request, lang));
     }
 
     @GetMapping("/{testId}/questions")
@@ -62,40 +73,15 @@ public class TestController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/addtests")
-    public ResponseEntity<?> addTests(@RequestBody List<CreateTestRequest> requests) {
-        try {
-            List<Test> createdTests = testService.addTestsFromDto(requests);
-            return ResponseEntity.ok(createdTests);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PostMapping("/addquestions")
-    public ResponseEntity<?> createquestion(@RequestBody List<CreateQuestionRequest> requests) {
-        try {
-            List<Question> createdQuestions = questionService.createQuestionsFromDto(requests);
-            return ResponseEntity.ok(createdQuestions);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
-    @PostMapping("/upload-questions")
-    public ResponseEntity<?> uploadQuestionsFromExcel(@RequestParam("file") MultipartFile file) {
-        try {
-            List<Question> createdQuestions = questionService.importQuestionsFromExcel(file);
-            return ResponseEntity.ok(createdQuestions);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
     @GetMapping("/test")
-   public ResponseEntity<String> test(){
+    public ResponseEntity<String> test() {
         return ResponseEntity.ok("TestController is working!");
-   }
+    }
+
+    public ResponseEntity<String> deleteTest(@PathVariable Long id) {
+      //  testService.deleteTest(id);
+        return ResponseEntity.ok("Test deleted successfully.");
+    }
 
     private TestResponse toTestResponse(Test test) {
         if (test == null) {
@@ -128,6 +114,7 @@ public class TestController {
                 .correctOptionIndex(question.getCorrectOptionIndex())
                 .explanation(question.getExplanation())
                 .hint(question.getHint())
+                .hintHi(question.getHintHi())
                 .build();
     }
 }

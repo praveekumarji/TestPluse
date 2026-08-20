@@ -1,6 +1,7 @@
 package com.testpulse.controller;
 
 import com.testpulse.dto.AuthResponse;
+import com.testpulse.dto.ChangePasswordRequest;
 import com.testpulse.dto.CreateUserRequest;
 import com.testpulse.dto.UserResponse;
 import com.testpulse.model.SubscriptionStatus;
@@ -33,7 +34,7 @@ public class AuthController {
             @RequestParam(defaultValue = "en") String preferredLanguage) {
         try {
             User user = userService.registerUser(email, mobileNumber, password, fullName, preferredLanguage);
-            String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber());
+            String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber(), user.getRole().name());
             return ResponseEntity.ok(AuthResponse.builder()
                     .token(token)
                     .user(toUserResponse(user))
@@ -76,7 +77,7 @@ public class AuthController {
             user.setSubscriptionStatus("PAID".equalsIgnoreCase(subscriptionStatus)
                     ? SubscriptionStatus.PAID
                     : SubscriptionStatus.FREE);
-            String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber());
+            String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber(), user.getRole().name());
             return ResponseEntity.ok(AuthResponse.builder()
                     .token(token)
                     .user(toUserResponse(user))
@@ -91,7 +92,7 @@ public class AuthController {
         try {
             Optional<User> user = userService.login(mobileNumber, password);
             if (user.isPresent()) {
-                String token = JwtUtil.generateToken(user.get().getId(), user.get().getMobileNumber());
+                String token = JwtUtil.generateToken(user.get().getId(), user.get().getMobileNumber(), user.get().getRole().name());
                 return ResponseEntity.ok(AuthResponse.builder()
                         .token(token)
                         .user(toUserResponse(user.get()))
@@ -99,6 +100,30 @@ public class AuthController {
             }
             return ResponseEntity.status(401).body("Invalid mobile number or password.");
         } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        try {
+            if (request == null) {
+                throw new IllegalArgumentException("Password payload cannot be null.");
+            }
+
+            String subject = SecurityContextHolder.getContext().getAuthentication().getName();
+            userService.changePassword(
+                    Long.valueOf(subject),
+                    request.getCurrentPassword(),
+                    request.getNewPassword()
+            );
+            return ResponseEntity.ok(Map.of(
+                    "message", "Password changed successfully",
+                    "status", "SUCCESS"
+            ));
+        } catch (NumberFormatException ex) {
+            return ResponseEntity.status(401).body("Valid authentication is required.");
+        } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }

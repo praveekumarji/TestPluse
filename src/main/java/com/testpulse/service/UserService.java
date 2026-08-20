@@ -24,5 +24,7 @@ public interface UserService {
 
     User updateSubscriptionStatus(Long userId, SubscriptionStatus status);
 
+    void changePassword(Long userId, String currentPassword, String newPassword);
+
     Optional<User> login(String mobileNumber, String password);
 }

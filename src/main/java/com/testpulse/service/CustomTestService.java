@@ -1,0 +1,19 @@
+package com.testpulse.service;
+
+import com.testpulse.dto.CreateCustomTestRequest;
+import com.testpulse.dto.CustomTestResponse;
+import com.testpulse.dto.QuestionResponse;
+
+import java.util.List;
+
+public interface CustomTestService {
+    List<CustomTestResponse> getMyCustomTests(String lang);
+
+    CustomTestResponse getCustomTestById(Long id, String lang);
+
+    CustomTestResponse createCustomTest(CreateCustomTestRequest request, String lang);
+
+    void deleteCustomTest(Long id);
+
+    List<QuestionResponse> getQuestionsForCustomTest(Long id, String lang);
+}

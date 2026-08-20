@@ -47,4 +47,11 @@ public class Test {
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private TestType testType = TestType.FREE;
+
+    @Column
+    private Long ownerUserId;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean active = true;
 }

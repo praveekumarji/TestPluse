@@ -18,10 +18,11 @@ public class JwtUtil {
 
     private static final Key KEY = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
-    public static String generateToken(Long userId, String mobileNumber) {
+    public static String generateToken(Long userId, String mobileNumber, String role) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", userId);
         claims.put("mobileNumber", mobileNumber);
+        claims.put("role", role);
 
         return Jwts.builder()
                 .setClaims(claims)

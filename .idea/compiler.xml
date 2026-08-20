@@ -16,11 +16,13 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.42/lombok-1.18.42.jar" />
         </processorPath>
         <module name="testpulse" />
+        <module name="TestPulse" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="TestPulse" options="-parameters" />
       <module name="testpulse" options="-parameters" />
     </option>
   </component>

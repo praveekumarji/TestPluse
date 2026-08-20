@@ -13,6 +13,11 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.Optional;
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 public class TestServiceImpl implements TestService {
@@ -34,22 +39,36 @@ public class TestServiceImpl implements TestService {
             tests = tests.stream()
                     .filter(test ->
                             (test.getTitle() != null && test.getTitle().toLowerCase(Locale.ROOT).contains(query)) ||
-                            (test.getDescription() != null && test.getDescription().toLowerCase(Locale.ROOT).contains(query)) ||
-                            (test.getTitleHi() != null && test.getTitleHi().toLowerCase(Locale.ROOT).contains(query)))
+                                    (test.getDescription() != null && test.getDescription().toLowerCase(Locale.ROOT).contains(query)) ||
+                                    (test.getTitleHi() != null && test.getTitleHi().toLowerCase(Locale.ROOT).contains(query)))
                     .toList();
         }
 
-        return tests.stream().map(test -> applyLanguage(test, lang)).toList();
+        Long currentUserId = getCurrentUserId().orElse(null);
+        return tests.stream()
+                .filter(Test::isActive)
+               .filter(test -> test.getOwnerUserId() == null || Objects.equals(test.getOwnerUserId(), currentUserId))
+                .map(test -> applyLanguage(test, lang))
+                .toList();
     }
 
     @Override
     public Test getTestById(Long id, String lang) {
-        Test test = testRepository.findById(id).orElseThrow(() -> new RuntimeException("Test not found"));
+        Long currentUserId = getCurrentUserId().orElse(null);
+        Test test = testRepository.findById(id)
+                .filter(Test::isActive)
+                .filter(t -> t.getOwnerUserId() == null || Objects.equals(t.getOwnerUserId(), currentUserId))
+                .orElseThrow(() -> new RuntimeException("Test not found"));
         return applyLanguage(test, lang);
     }
 
     @Override
-    public Test createCustomTest(String subject, int questionCount, String difficultyLevel, String mode, String lang) {
+    public Test createCustomTest(String subject, int questionCount, String difficulty, String mode, String lang) {
+        return null;
+    }
+
+    //@Override
+    public Test createCustomTest(String subject, int questionCount, String difficultyLevel, String mode, String lang, Long ownerUserId) {
         String normalizedSubject = subject == null ? "General" : subject.trim();
         String normalizedDifficulty = difficultyLevel == null || difficultyLevel.isBlank() ? "MEDIUM" : difficultyLevel.trim().toUpperCase(Locale.ROOT);
         String normalizedMode = mode == null || mode.isBlank() ? "PRACTICE" : mode.trim().toUpperCase(Locale.ROOT);
@@ -64,11 +83,13 @@ public class TestServiceImpl implements TestService {
                 .durationMinutes("30")
                 .mode(Modes.valueOf(normalizedMode))
                 .difficulty(difficulty.valueOf(normalizedDifficulty))
-                .testType(TestType.FREE)
+                .testType(TestType.PAID)
+                .ownerUserId(ownerUserId)
                 .build();
 
         return applyLanguage(testRepository.save(test), lang);
     }
+
 
     @Override
     public List<Test> addTest(List<Test> tests) {
@@ -168,6 +189,19 @@ public class TestServiceImpl implements TestService {
         return test;
     }
 
+    private Optional<Long> getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getPrincipal())) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(Long.valueOf(authentication.getName()));
+        } catch (NumberFormatException ex) {
+            return Optional.empty();
+        }
+    }
+
     private String translateSubjectToHindi(String subject) {
         if (subject == null || subject.isBlank()) {
             return "सामान्य";
@@ -181,4 +215,58 @@ public class TestServiceImpl implements TestService {
             default -> subject;
         };
     }
+
+    @Override
+    public Test updateTest(Long id, Test testUpdate) {
+        Test existing = testRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Test not found"));
+
+        if (testUpdate.getTitle() != null && !testUpdate.getTitle().isBlank()) {
+            existing.setTitle(testUpdate.getTitle());
+        }
+        if (testUpdate.getTitleHi() != null) {
+            existing.setTitleHi(testUpdate.getTitleHi());
+        }
+        if (testUpdate.getSubject() != null && !testUpdate.getSubject().isBlank()) {
+            existing.setSubject(testUpdate.getSubject());
+        }
+        if (testUpdate.getSubjectHi() != null) {
+            existing.setSubjectHi(testUpdate.getSubjectHi());
+        }
+        if (testUpdate.getDescription() != null && !testUpdate.getDescription().isBlank()) {
+            existing.setDescription(testUpdate.getDescription());
+        }
+        if (testUpdate.getDescriptionHi() != null) {
+            existing.setDescriptionHi(testUpdate.getDescriptionHi());
+        }
+        if (testUpdate.getDurationMinutes() != null) {
+            existing.setDurationMinutes(testUpdate.getDurationMinutes());
+        }
+        if (testUpdate.getMode() != null) {
+            existing.setMode(testUpdate.getMode());
+        }
+        if (testUpdate.getDifficulty() != null) {
+            existing.setDifficulty(testUpdate.getDifficulty());
+        }
+        if (testUpdate.getTestType() != null) {
+            existing.setTestType(testUpdate.getTestType());
+        }
+        existing.setActive(testUpdate.isActive());
+
+        validateTest(existing);
+        return applyLanguage(testRepository.save(existing), "en");
+    }
+
+    @Override
+    public void deactivateTest(Long id) {
+        Test test = testRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Test not found"));
+        test.setActive(false);
+        testRepository.save(test);
+    }
+
+   /* @Override
+    public void deleteTest(Long id) {
+
+    }*/
 }
