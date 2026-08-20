@@ -20,4 +20,5 @@ public class QuestionResponse {
     private int correctOptionIndex;
     private String explanation;
     private String hint;
+    private String hintHi;
 }

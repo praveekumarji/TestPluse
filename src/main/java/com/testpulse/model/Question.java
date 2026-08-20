@@ -57,6 +57,13 @@ public class Question {
     @Column
     private String hint;
 
+    @Column
+    private String hintHi;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean active = true;
+
     @Transient
     public String getTestId() {
         return test == null ? null : String.valueOf(test.getId());

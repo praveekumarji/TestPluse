@@ -17,5 +17,9 @@ public interface QuestionService {
 
     List<Question> createQuestionsFromDto(List<CreateQuestionRequest> requests);
 
+    Question updateQuestion(Long id, Question question);
+
+    void deactivateQuestion(Long id);
+
     List<Question> importQuestionsFromExcel(MultipartFile file);
 }
