@@ -1,7 +1,7 @@
 package com.testpulse.controller;
 
 import com.testpulse.dto.CreateCustomTestRequest;
-import com.testpulse.dto.CustomTestResponse;
+import com.testpulse.dto.CustomTestPreviewResponse;
 import com.testpulse.dto.CreateQuestionRequest;
 import com.testpulse.dto.CreateTestRequest;
 import com.testpulse.dto.QuestionResponse;
@@ -51,18 +51,13 @@ public class TestController {
     }
 
     @PostMapping("/custom")
-    public ResponseEntity<CustomTestResponse> createCustomTest(@RequestParam String subject,
-                                                               @RequestParam String difficulty,
-                                                               @RequestParam String mode,
-                                                               @RequestParam(required = false) List<Long> questionIds,
-                                                               @RequestParam(defaultValue = "en") String lang) {
-        CreateCustomTestRequest request = CreateCustomTestRequest.builder()
-                .subject(subject)
-                .difficulty(difficulty)
-                .mode(mode)
-                .questionIds(questionIds)
-                .build();
-        return ResponseEntity.ok(customTestService.createCustomTest(request, lang));
+        public ResponseEntity<CustomTestPreviewResponse> createCustomTest(@RequestParam String subject,
+                                           @RequestParam(defaultValue = "10") int questionCount,
+                                           @RequestParam(defaultValue = "MEDIUM") String difficulty,
+                                           @RequestParam(defaultValue = "PRACTICE") String mode,
+                                           @RequestParam(defaultValue = "en") String lang) {
+        return ResponseEntity.ok(customTestService.generateCustomTest(
+            subject, questionCount, difficulty, mode, lang));
     }
 
     @GetMapping("/{testId}/questions")

@@ -1,6 +1,8 @@
 package com.testpulse.service.impl;
 
 import com.testpulse.dto.CreateCustomTestRequest;
+import com.testpulse.dto.CustomQuestionResponse;
+import com.testpulse.dto.CustomTestPreviewResponse;
 import com.testpulse.dto.CustomTestResponse;
 import com.testpulse.dto.QuestionResponse;
 import com.testpulse.model.CustomTest;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Collections;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,6 +35,49 @@ public class CustomTestServiceImpl implements CustomTestService {
     public CustomTestServiceImpl(CustomTestRepository customTestRepository, QuestionRepository questionRepository) {
         this.customTestRepository = customTestRepository;
         this.questionRepository = questionRepository;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CustomTestPreviewResponse generateCustomTest(String subject, int questionCount,
+                                                         String difficultyLevel, String modeName, String lang) {
+        if (subject == null || subject.isBlank()) {
+            throw new IllegalArgumentException("Subject is required.");
+        }
+        if (questionCount < 1 || questionCount > 100) {
+            throw new IllegalArgumentException("Question count must be between 1 and 100.");
+        }
+
+        String normalizedDifficulty = difficultyLevel == null || difficultyLevel.isBlank()
+                ? "MEDIUM" : difficultyLevel.trim().toUpperCase(Locale.ROOT);
+        String normalizedMode = modeName == null || modeName.isBlank()
+                ? "PRACTICE" : modeName.trim().toUpperCase(Locale.ROOT);
+        com.testpulse.model.difficulty difficulty = com.testpulse.model.difficulty.valueOf(normalizedDifficulty);
+        com.testpulse.model.Modes mode = com.testpulse.model.Modes.valueOf(normalizedMode);
+
+        List<Question> questions = questionRepository.findActiveForCustomTest(subject.trim(), mode, difficulty);
+        Collections.shuffle(questions);
+        if (questions.size() < questionCount) {
+            throw new IllegalArgumentException("Only " + questions.size()
+                    + " questions are available for the selected subject, mode, and difficulty.");
+        }
+
+        List<CustomQuestionResponse> selectedQuestions = questions.stream()
+                .limit(questionCount)
+                .map(question -> toPreviewQuestion(question, lang))
+                .collect(Collectors.toList());
+
+        return CustomTestPreviewResponse.builder()
+                .id("custom_test_" + java.util.UUID.randomUUID().toString().replace("-", "").substring(0, 8))
+                .title(subject.trim() + " " + normalizedMode + " Challenge")
+                .subject(subject.trim())
+                .description("Custom generated test with " + questionCount + " questions.")
+                .durationMinutes(questionCount * 2)
+                .totalQuestions(questionCount)
+                .mode(mode.name())
+                .testType(TestType.FREE.name())
+                .questions(selectedQuestions)
+                .build();
     }
 
     @Override
@@ -157,6 +203,26 @@ public class CustomTestServiceImpl implements CustomTestService {
                 .correctOptionIndex(question.getCorrectOptionIndex())
                 .explanation(question.getExplanation())
                 .hint(question.getHint())
+                .hintHi(question.getHintHi())
+                .build();
+    }
+
+    private CustomQuestionResponse toPreviewQuestion(Question question, String lang) {
+        boolean hindi = "hi".equalsIgnoreCase(lang) || "hindi".equalsIgnoreCase(lang);
+        return CustomQuestionResponse.builder()
+                .id(question.getId())
+                .testId(question.getTest() == null ? null : question.getTest().getId())
+                .subject(question.getSubject())
+                .subjectHi(question.getSubjectHi())
+                .topic(question.getTopic())
+                .text(hindi && question.getTextHi() != null ? question.getTextHi() : question.getText())
+                .textHi(question.getTextHi())
+                .options(hindi && question.getOptionsHi() != null ? question.getOptionsHi() : question.getOptions())
+                .optionsHi(question.getOptionsHi())
+                .correctOptionIndex(question.getCorrectOptionIndex())
+                .explanation(hindi && question.getExplanationHi() != null ? question.getExplanationHi() : question.getExplanation())
+                .explanationHi(question.getExplanationHi())
+                .hint(hindi && question.getHintHi() != null ? question.getHintHi() : question.getHint())
                 .hintHi(question.getHintHi())
                 .build();
     }
