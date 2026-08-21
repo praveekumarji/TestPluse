@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TestPulse API Integration Guide</title>
+<style>
+  @page { size: A4; margin: 18mm; }
+  body { font-family: Arial, sans-serif; color: #18212f; line-height: 1.45; font-size: 11pt; }
+  h1 { color: #123b62; font-size: 25pt; margin-bottom: 4px; }
+  h2 { color: #123b62; border-bottom: 2px solid #d7e4ef; padding-bottom: 4px; margin-top: 28px; }
+  h3 { color: #245a83; margin-top: 20px; }
+  code, pre { font-family: Consolas, monospace; }
+  pre { background: #f3f6f8; border: 1px solid #d9e1e7; border-radius: 4px; padding: 10px; white-space: pre-wrap; font-size: 9pt; }
+  table { width: 100%; border-collapse: collapse; margin: 8px 0 16px; }
+  th, td { border: 1px solid #cbd6df; padding: 6px; text-align: left; vertical-align: top; }
+  th { background: #eaf2f7; }
+  .note { background: #fff8df; border-left: 4px solid #e4b52d; padding: 9px; }
+  .small { color: #536170; font-size: 9pt; }
+  .page-break { page-break-before: always; }
+</style>
+</head>
+<body>
+<h1>TestPulse API Integration Guide</h1>
+<p><strong>Purpose:</strong> API reference for implementing the TestPulse app in Google AI Studio.</p>
+<p class="small">Generated for the deployed Spring Boot API. Do not expose JWT, database, SMTP, or other secrets in frontend code.</p>
+
+<h2>Base URL</h2>
+<pre>https://testpluse-production.up.railway.app</pre>
+<p>For local Docker testing:</p>
+<pre>http://localhost:8081</pre>
+
+<h2>Authentication</h2>
+<h3>Login</h3>
+<pre>POST /api/auth/login?mobileNumber={mobileNumber}&amp;password={password}</pre>
+<p>Successful response contains a JWT token:</p>
+<pre>{
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "user": {
+    "id": 1,
+    "email": "user@example.com",
+    "mobileNumber": "9876543210",
+    "fullName": "Test User",
+    "preferredLanguage": "en",
+    "subscriptionStatus": "FREE"
+  }
+}</pre>
+<p>For protected APIs, send:</p>
+<pre>Authorization: Bearer YOUR_JWT_TOKEN</pre>
+
+<h2>Generate Custom Test</h2>
+<div class="note">This endpoint reads matching questions from MySQL, randomly selects the requested number, and returns the test. It does not save the generated test or questions.</div>
+<h3>Request</h3>
+<pre>POST /api/tests/custom</pre>
+<table><tr><th>Parameter</th><th>Required</th><th>Values / example</th></tr>
+<tr><td>subject</td><td>Yes</td><td>Mathematics</td></tr>
+<tr><td>questionCount</td><td>No</td><td>1 to 100; default 10</td></tr>
+<tr><td>difficulty</td><td>No</td><td>EASY, MEDIUM, HARD; default MEDIUM</td></tr>
+<tr><td>mode</td><td>No</td><td>PRACTICE, EXAM; default PRACTICE</td></tr>
+<tr><td>lang</td><td>No</td><td>en or hi; default en</td></tr></table>
+<pre>POST https://testpluse-production.up.railway.app/api/tests/custom?subject=Mathematics&amp;questionCount=10&amp;difficulty=MEDIUM&amp;mode=PRACTICE&amp;lang=en</pre>
+<p>No request body is required.</p>
+<h3>Response</h3>
+<pre>{
+  "id": "custom_test_a1b2c3d4",
+  "title": "Mathematics PRACTICE Challenge",
+  "subject": "Mathematics",
+  "description": "Custom generated test with 10 questions.",
+  "durationMinutes": 20,
+  "totalQuestions": 10,
+  "mode": "PRACTICE",
+  "testType": "FREE",
+  "questions": [
+    {
+      "id": 16,
+      "testId": 16,
+      "subject": "Mathematics",
+      "subjectHi": "गणित",
+      "topic": "Calculus",
+      "text": "What is the derivative of x²?",
+      "textHi": "x² का अवकलज क्या है?",
+      "options": ["x", "2x", "x²", "2"],
+      "optionsHi": ["x", "2x", "x²", "2"],
+      "correctOptionIndex": 1,
+      "explanation": "The derivative of x² is 2x.",
+      "explanationHi": "x² का अवकलज 2x होता है।",
+      "hint": "Use the power rule.",
+      "hintHi": "घात नियम का प्रयोग करें।"
+    }
+  ]
+}</pre>
+<p>When <code>lang=hi</code>, the primary text, options, explanation, and hint fields use Hindi when Hindi content exists. The answer index is zero-based.</p>
+
+<h2>Subscription Plans</h2>
+<h3>Get Plans</h3>
+<pre>GET /api/subscription-plans</pre>
+<p>This endpoint is public and does not require JWT authentication.</p>
+<h3>Response</h3>
+<pre>[
+  {
+    "id": "monthly_basic",
+    "planCode": "BASIC_MONTHLY",
+    "title": "Basic Monthly",
+    "subtitle": "Practice tests and question access",
+    "durationDays": 30,
+    "originalAmountInPaise": 49900,
+    "discountedAmountInPaise": 29900,
+    "displayPrice": "₹299",
+    "displayOriginalPrice": "₹499",
+    "discountPercentage": 40,
+    "badge": "Popular",
+    "isRecommended": true,
+    "features": [
+      "Unlimited practice tests",
+      "Detailed explanations",
+      "Progress tracking"
+    ]
+  }
+]</pre>
+<p>Amount fields are in paise. Divide by 100 to display the amount in rupees. Use <code>displayPrice</code> when the UI should show the server-formatted price.</p>
+
+<h3>Create Plan (Admin)</h3>
+<pre>POST /api/subscription-plans
+Content-Type: application/json
+Authorization: Bearer ADMIN_JWT_TOKEN</pre>
+<pre>{
+  "id": "monthly_basic",
+  "planCode": "BASIC_MONTHLY",
+  "title": "Basic Monthly",
+  "subtitle": "Practice tests and question access",
+  "durationDays": 30,
+  "originalAmountInPaise": 49900,
+  "discountedAmountInPaise": 29900,
+  "displayPrice": "₹299",
+  "displayOriginalPrice": "₹499",
+  "discountPercentage": 40,
+  "badge": "Popular",
+  "isRecommended": true,
+  "features": ["Unlimited practice tests", "Detailed explanations"]
+}</pre>
+<p>The <code>id</code>, <code>planCode</code>, and <code>title</code> are required. <code>durationDays</code> must be greater than zero and price values cannot be negative.</p>
+
+<h3>Update Plan (Admin)</h3>
+<pre>PUT /api/subscription-plans/{id}
+Content-Type: application/json
+Authorization: Bearer ADMIN_JWT_TOKEN</pre>
+<p>Use the same JSON body as create. The path <code>{id}</code> must identify an existing plan. The response is the updated plan object.</p>
+
+<h3>Delete Plan (Admin)</h3>
+<pre>DELETE /api/subscription-plans/{id}
+Authorization: Bearer ADMIN_JWT_TOKEN</pre>
+<pre>{
+  "message": "Plan deleted successfully"
+}</pre>
+
+<div class="note">The GET endpoint is available to the app's pricing screen. Create, update, and delete are restricted to users with the ADMIN role. A normal user token returns HTTP 403.</div>
+
+<h2>Forgot Password</h2>
+<h3>Request OTP</h3>
+<pre>POST /api/auth/forgot-password
+Content-Type: application/json</pre>
+<pre>{
+  "email": "user@example.com"
+}</pre>
+<p>Response:</p>
+<pre>{
+  "message": "Password reset OTP sent to your email."
+}</pre>
+<p>The backend creates a six-digit OTP, stores only its hash, sends it by email, and expires it after 10 minutes. A 60-second request cooldown is applied.</p>
+<h3>Reset Password</h3>
+<pre>POST /api/auth/reset-password
+Content-Type: application/json</pre>
+<pre>{
+  "email": "user@example.com",
+  "otp": "123456",
+  "newPassword": "NewPassword123"
+}</pre>
+<pre>{
+  "message": "Password reset successfully."
+}</pre>
+<p>The OTP is single-use. The new password must contain at least 8 characters.</p>
+
+<h2>User Feedback</h2>
+<h3>Request</h3>
+<pre>POST /api/feedback
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN</pre>
+<pre>{
+  "userId": "user_abc123",
+  "userEmail": "user@example.com",
+  "category": "APP_EXPERIENCE",
+  "rating": 5,
+  "message": "The mock tests are great!",
+  "appVersion": "1.0.0",
+  "deviceInfo": {
+    "osVersion": "Android 14",
+    "deviceModel": "Pixel 8 Pro"
+  },
+  "context": {
+    "testId": "math_calculus_01",
+    "questionId": "q_104",
+    "subject": "Mathematics"
+  },
+  "createdAt": "2026-08-20T09:28:48Z"
+}</pre>
+<p>Allowed categories: <code>BUG_REPORT</code>, <code>FEATURE_REQUEST</code>, <code>QUESTION_ERROR</code>, <code>BILLING</code>, <code>APP_EXPERIENCE</code>. Rating is optional and must be 1 through 5.</p>
+<h3>Response</h3>
+<pre>{
+  "success": true,
+  "feedbackId": "fb_99812",
+  "message": "Thank you for your feedback!"
+}</pre>
+
+<h2>Google AI Studio Frontend Rules</h2>
+<ul>
+<li>Keep the API base URL in one environment/config value.</li>
+<li>Store the JWT in the app's secure storage, not in source code.</li>
+<li>Send the Bearer token only to protected endpoints.</li>
+<li>Do not send Markdown code fences in JSON requests.</li>
+<li>For custom tests, render <code>questions</code> from the response; do not expect a saved test ID to be fetchable later.</li>
+<li>Use <code>correctOptionIndex</code> only after the user submits an answer; do not reveal it during the question view.</li>
+<li>Handle HTTP 400, 401, 403, and 500 responses with user-friendly messages.</li>
+</ul>
+
+<h2>Example JavaScript Call</h2>
+<pre>const params = new URLSearchParams({
+  subject: "Mathematics",
+  questionCount: "10",
+  difficulty: "MEDIUM",
+  mode: "PRACTICE",
+  lang: "en"
+});
+
+const response = await fetch(
+  `${API_BASE_URL}/api/tests/custom?${params}`,
+  { method: "POST" }
+);
+
+if (!response.ok) throw new Error("Unable to generate test");
+const customTest = await response.json();</pre>
+
+<h2>Error Behavior</h2>
+<table><tr><th>Status</th><th>Meaning</th></tr>
+<tr><td>400</td><td>Invalid parameters, unsupported mode/difficulty, or not enough matching questions.</td></tr>
+<tr><td>401</td><td>JWT missing or invalid for a protected endpoint.</td></tr>
+<tr><td>403</td><td>User is authenticated but does not have the required role.</td></tr>
+<tr><td>500</td><td>Unexpected server or database error.</td></tr></table>
+</body>
+</html>

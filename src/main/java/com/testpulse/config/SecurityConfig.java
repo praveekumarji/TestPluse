@@ -32,7 +32,6 @@ public class SecurityConfig {
                                 "/api/auth/**",
                                 "/api/tests/**",
                                 "/api/payment/**",
-                                "/api/subscription-plans",
                                 "/api/config",
                                 "/error",
                                 "/swagger-ui/**",
@@ -40,6 +39,7 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/v3/api-docs"
                         ).permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/subscription-plans").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/coupons").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/coupons/validate").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/coupons/calculate").permitAll()

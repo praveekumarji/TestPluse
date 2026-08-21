@@ -88,16 +88,16 @@ public class PasswordResetService {
     private void sendEmail(User user, String otp) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(fromAddress);
             helper.setTo(user.getEmail());
-            helper.setSubject("TestPulse password reset OTP");
+            helper.setSubject("TestPlus password reset OTP");
                 String plainText = "Hello " + user.getFullName() + ",\n\n"
-                    + "Your TestPulse password reset OTP is: " + otp + "\n"
+                    + "Your TestPlus password reset OTP is: " + otp + "\n"
                     + "It expires in " + OTP_EXPIRY_MINUTES + " minutes.\n\n"
                     + "If you did not request this, ignore this email.";
                 String htmlText = "<p>Hello " + HtmlUtils.htmlEscape(user.getFullName()) + ",</p>"
-                    + "<p>Your TestPulse password reset OTP is: <strong>" + otp + "</strong></p>"
+                    + "<p>Your TestPlus password reset OTP is: <strong>" + otp + "</strong></p>"
                     + "<p>It expires in " + OTP_EXPIRY_MINUTES + " minutes.</p>"
                     + "<p>If you did not request this, ignore this email.</p>";
                 helper.setText(plainText, htmlText);
