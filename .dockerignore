@@ -1,0 +1,10 @@
+.git
+.idea
+target
+*/target
+logs
+out
+.env
+*.iml
+README.md
+question-upload-template.xlsx
