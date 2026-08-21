@@ -2,5 +2,7 @@ package com.testpulse.model;
 
 public enum SubscriptionStatus {
     FREE,
-    PAID
+    PAID,
+    PRIME,
+    EXPIRED
 }

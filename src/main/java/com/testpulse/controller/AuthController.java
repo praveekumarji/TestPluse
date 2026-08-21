@@ -3,13 +3,17 @@ package com.testpulse.controller;
 import com.testpulse.dto.AuthResponse;
 import com.testpulse.dto.ChangePasswordRequest;
 import com.testpulse.dto.CreateUserRequest;
+import com.testpulse.dto.ForgotPasswordRequest;
+import com.testpulse.dto.ResetPasswordRequest;
 import com.testpulse.dto.UserResponse;
 import com.testpulse.model.SubscriptionStatus;
 import com.testpulse.model.User;
+import com.testpulse.service.PasswordResetService;
 import com.testpulse.service.UserService;
 import com.testpulse.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -20,9 +24,11 @@ import java.util.Optional;
 public class AuthController {
 
     private final UserService userService;
+    private final PasswordResetService passwordResetService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, PasswordResetService passwordResetService) {
         this.userService = userService;
+        this.passwordResetService = passwordResetService;
     }
 
     @PostMapping("/register")
@@ -100,6 +106,26 @@ public class AuthController {
             }
             return ResponseEntity.status(401).body("Invalid mobile number or password.");
         } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        try {
+            passwordResetService.sendOtp(request);
+            return ResponseEntity.ok(Map.of("message", "Password reset OTP sent to your email."));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        try {
+            passwordResetService.resetPassword(request);
+            return ResponseEntity.ok(Map.of("message", "Password reset successfully."));
+        } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
