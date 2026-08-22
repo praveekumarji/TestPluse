@@ -17,4 +17,6 @@ public class UserResponse {
     private String fullName;
     private String preferredLanguage;
     private SubscriptionStatus subscriptionStatus;
+    private String subscriptionPlan;
+    private java.time.LocalDateTime subscriptionExpiry;
 }

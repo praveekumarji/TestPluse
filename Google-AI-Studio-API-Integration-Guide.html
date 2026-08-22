@@ -90,6 +90,48 @@
 }</pre>
 <p>When <code>lang=hi</code>, the primary text, options, explanation, and hint fields use Hindi when Hindi content exists. The answer index is zero-based.</p>
 
+<h2>Payment Records</h2>
+<p>Use one endpoint for Razorpay initiated, successful, failed, and cancelled payment events.</p>
+<h3>Request</h3>
+<pre>POST /api/payment/records
+Content-Type: application/json
+Authorization: Bearer YOUR_JWT_TOKEN</pre>
+<pre>{
+  "userId": 123,
+  "userMobile": "9876543210",
+  "userEmail": "user@example.com",
+  "userName": "Rahul Sharma",
+  "planId": "monthly_basic",
+  "planCode": "BASIC_MONTHLY",
+  "planTitle": "Basic Monthly",
+  "durationDays": 30,
+  "amountInPaise": 29900,
+  "currency": "INR",
+  "paymentStatus": "SUCCESS",
+  "razorpayPaymentId": "pay_OXXXXXX12345",
+  "razorpayOrderId": "order_OXXXXXX12345",
+  "razorpaySignature": "optional_signature_string",
+  "errorMessage": null
+}</pre>
+<p><code>paymentStatus</code> must be <code>INITIATED</code>, <code>SUCCESS</code>, <code>FAILED</code>, or <code>CANCELLED</code>. The current backend expects numeric <code>userId</code>.</p>
+<h3>Event Behavior</h3>
+<table><tr><th>Status</th><th>Database behavior</th></tr>
+<tr><td>INITIATED</td><td>Stores a pending payment event. User subscription is unchanged.</td></tr>
+<tr><td>SUCCESS</td><td>Stores a successful payment and sets the user to PAID, saves the plan code, and sets expiry to now plus durationDays.</td></tr>
+<tr><td>FAILED</td><td>Stores a failed payment. User subscription is unchanged.</td></tr>
+<tr><td>CANCELLED</td><td>Stores a cancelled payment. User subscription is unchanged.</td></tr></table>
+<h3>Response</h3>
+<pre>{
+  "success": true,
+  "message": "Payment record stored successfully",
+  "paymentStatus": "SUCCESS",
+  "user": {
+    "id": 123,
+    "subscriptionStatus": "PAID",
+    "subscriptionPlan": "BASIC_MONTHLY"
+  }
+}</pre>
+
 <h2>Subscription Plans</h2>
 <h3>Get Plans</h3>
 <pre>GET /api/subscription-plans</pre>

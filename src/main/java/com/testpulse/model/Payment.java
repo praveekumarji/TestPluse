@@ -28,8 +28,35 @@ public class Payment {
     @Column(name = "plan_name", nullable = false)
     private String planName;
 
+    @Column(name = "plan_id")
+    private String planId;
+
+    @Column(name = "plan_code")
+    private String planCode;
+
+    @Column(name = "plan_title")
+    private String planTitle;
+
+    @Column(name = "duration_days")
+    private Integer durationDays;
+
+    @Column(name = "original_amount_in_paise")
+    private Long originalAmountInPaise;
+
+    @Column(name = "discount_amount_in_paise")
+    private Long discountAmountInPaise;
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
+
+    @Column(name = "amount_in_paise")
+    private Long amountInPaise;
+
+    @Column(name = "coupon_code")
+    private String couponCode;
+
+    @Column(length = 10)
+    private String currency;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -38,6 +65,12 @@ public class Payment {
 
     @Column(name = "razorpay_payment_id")
     private String razorpayPaymentId;
+
+    @Column(name = "razorpay_order_id")
+    private String razorpayOrderId;
+
+    @Column(name = "razorpay_signature")
+    private String razorpaySignature;
 
     @Column(name = "failure_reason")
     private String failureReason;

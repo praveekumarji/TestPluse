@@ -39,6 +39,12 @@ public class User {
     @Builder.Default
     private SubscriptionStatus subscriptionStatus = SubscriptionStatus.FREE;
 
+    @Column(name = "subscription_plan")
+    private String subscriptionPlan;
+
+    @Column(name = "subscription_expiry")
+    private LocalDateTime subscriptionExpiry;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
