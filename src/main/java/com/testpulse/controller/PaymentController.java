@@ -2,6 +2,7 @@ package com.testpulse.controller;
 
 import com.testpulse.dto.PaymentFailureRequest;
 import com.testpulse.dto.PaymentInitiateRequest;
+import com.testpulse.dto.PaymentRecordRequest;
 import com.testpulse.dto.PaymentSuccessRequest;
 import com.testpulse.model.Payment;
 import com.testpulse.model.PaymentStatus;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -48,15 +50,9 @@ public class PaymentController {
     }
 
     @PostMapping("/record-success")
-    public ResponseEntity<?> recordSuccess(@RequestBody PaymentSuccessRequest request) {
+    public ResponseEntity<?> recordSuccess(@Valid @RequestBody PaymentRecordRequest request) {
         try {
-            Payment payment = paymentService.recordSuccess(request.getPaymentId(), request.getRazorpayPaymentId());
-            return ResponseEntity.ok(Map.of(
-                    "paymentId", payment.getId(),
-                    "status", payment.getStatus().name(),
-                    "razorpayPaymentId", payment.getRazorpayPaymentId(),
-                    "paidAt", payment.getPaidAt()
-            ));
+            return ResponseEntity.ok(paymentService.recordPayment(request));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }
@@ -71,6 +67,15 @@ public class PaymentController {
                     "status", payment.getStatus().name(),
                     "failureReason", payment.getFailureReason()
             ));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    @PostMapping("/records")
+    public ResponseEntity<?> recordPayment(@Valid @RequestBody PaymentRecordRequest request) {
+        try {
+            return ResponseEntity.ok(paymentService.recordPayment(request));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }

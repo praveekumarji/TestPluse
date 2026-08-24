@@ -175,6 +175,8 @@ public class AuthController {
                 .fullName(user.getFullName())
                 .preferredLanguage(user.getPreferredLanguage())
                 .subscriptionStatus(user.getSubscriptionStatus())
+                .subscriptionPlan(user.getSubscriptionPlan())
+                .subscriptionExpiry(user.getSubscriptionExpiry())
                 .build();
     }
 }

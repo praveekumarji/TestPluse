@@ -140,7 +140,7 @@ public class CouponServiceImpl implements CouponService {
         if (userId != null && !userId.isBlank()) {
             boolean alreadyUsed = couponUsageRepository.findByCouponCodeAndUserId(normalizedCode, userId).isPresent();
             if (alreadyUsed) {
-                return buildFailure("Coupon has already been used by this user");
+             //   return buildFailure("Coupon has already been used by this user"); //commentd by praveen
             }
         }
 
