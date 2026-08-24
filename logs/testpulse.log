@@ -43,3 +43,95 @@ This generated password is for development use only. Your security configuration
 2026-08-24T14:18:07.569+05:30  INFO 42620 --- [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2026-08-24T14:18:07.571+05:30  INFO 42620 --- [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
 2026-08-24T14:18:09.376+05:30  INFO 42620 --- [http-nio-8081-exec-9] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 1380 ms
+2026-08-24T14:30:57.079+05:30  INFO 42620 --- [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-24T14:30:57.089+05:30  INFO 42620 --- [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-24T14:30:57.096+05:30  INFO 42620 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-24T14:30:57.099+05:30  INFO 42620 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-08-24T14:30:57.111+05:30  INFO 42620 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-08-24T14:31:06.382+05:30  INFO 40468 --- [main] com.testpulse.TestPluseApplication       : Starting TestPluseApplication using Java 25 with PID 40468 (E:\TestPluse\target\classes started by Praveen in E:\TestPluse)
+2026-08-24T14:31:06.386+05:30  INFO 40468 --- [main] com.testpulse.TestPluseApplication       : The following 1 profile is active: "dev"
+2026-08-24T14:31:09.246+05:30  INFO 40468 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-24T14:31:09.353+05:30  INFO 40468 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 99 ms. Found 13 JPA repository interfaces.
+2026-08-24T14:31:10.023+05:30  INFO 40468 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-08-24T14:31:10.038+05:30  INFO 40468 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-24T14:31:10.039+05:30  INFO 40468 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.14]
+2026-08-24T14:31:10.126+05:30  INFO 40468 --- [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 3688 ms
+2026-08-24T14:31:10.359+05:30  INFO 40468 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-24T14:31:10.435+05:30  INFO 40468 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 7.1.8.Final
+2026-08-24T14:31:11.000+05:30  INFO 40468 --- [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-24T14:31:11.043+05:30  INFO 40468 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-24T14:31:11.198+05:30  INFO 40468 --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@19d13d04
+2026-08-24T14:31:11.200+05:30  INFO 40468 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-24T14:31:11.252+05:30  WARN 40468 --- [main] org.hibernate.dialect.Dialect            : HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2026-08-24T14:31:11.257+05:30  WARN 40468 --- [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-24T14:31:11.277+05:30  INFO 40468 --- [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://127.0.0.1:3307/testplus?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 5.5.5
+	Default catalog/schema: testplus/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DatasourceConnectionProviderImpl
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-24T14:31:12.590+05:30  INFO 40468 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-24T14:31:12.829+05:30  INFO 40468 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-24T14:31:12.973+05:30  INFO 40468 --- [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-24T14:31:14.413+05:30  WARN 40468 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-08-24T14:31:14.499+05:30  WARN 40468 --- [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 32fc3065-179b-48e1-a260-a69d6b2f947a
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-24T14:31:14.506+05:30  INFO 40468 --- [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-24T14:31:15.166+05:30  INFO 40468 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-08-24T14:31:15.177+05:30  INFO 40468 --- [main] com.testpulse.TestPluseApplication       : Started TestPluseApplication in 9.313 seconds (process running for 9.902)
+2026-08-24T14:31:19.170+05:30  INFO 40468 --- [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-24T14:31:19.183+05:30  INFO 40468 --- [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-24T14:31:19.191+05:30  INFO 40468 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-24T14:31:19.194+05:30  INFO 40468 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-08-24T14:31:19.202+05:30  INFO 40468 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-08-24T14:34:32.041+05:30  INFO 31844 --- [main] com.testpulse.TestPluseApplication       : Starting TestPluseApplication using Java 25 with PID 31844 (E:\TestPluse\target\classes started by Praveen in E:\TestPluse)
+2026-08-24T14:34:32.045+05:30  INFO 31844 --- [main] com.testpulse.TestPluseApplication       : The following 1 profile is active: "dev"
+2026-08-24T14:34:33.351+05:30  INFO 31844 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-24T14:34:33.487+05:30  INFO 31844 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 125 ms. Found 13 JPA repository interfaces.
+2026-08-24T14:34:34.274+05:30  INFO 31844 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-08-24T14:34:34.295+05:30  INFO 31844 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-24T14:34:34.296+05:30  INFO 31844 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.14]
+2026-08-24T14:34:34.403+05:30  INFO 31844 --- [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2282 ms
+2026-08-24T14:34:34.651+05:30  INFO 31844 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-24T14:34:34.711+05:30  INFO 31844 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 7.1.8.Final
+2026-08-24T14:34:35.337+05:30  INFO 31844 --- [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-24T14:34:35.379+05:30  INFO 31844 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-24T14:34:35.576+05:30  INFO 31844 --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@19d13d04
+2026-08-24T14:34:35.578+05:30  INFO 31844 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-24T14:34:35.634+05:30  WARN 31844 --- [main] org.hibernate.dialect.Dialect            : HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2026-08-24T14:34:35.639+05:30  WARN 31844 --- [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-24T14:34:35.657+05:30  INFO 31844 --- [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://127.0.0.1:3307/testplus?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 5.5.5
+	Default catalog/schema: testplus/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DatasourceConnectionProviderImpl
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-24T14:34:36.990+05:30  INFO 31844 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-24T14:34:37.210+05:30  INFO 31844 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-24T14:34:37.309+05:30  INFO 31844 --- [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-24T14:34:38.620+05:30  WARN 31844 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-08-24T14:34:38.704+05:30  WARN 31844 --- [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 4b6db3a2-77b0-46f9-98ee-fd04b47c9301
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-24T14:34:38.710+05:30  INFO 31844 --- [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-24T14:34:39.274+05:30  INFO 31844 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-08-24T14:34:39.285+05:30  INFO 31844 --- [main] com.testpulse.TestPluseApplication       : Started TestPluseApplication in 7.895 seconds (process running for 8.602)

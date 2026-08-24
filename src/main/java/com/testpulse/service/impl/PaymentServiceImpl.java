@@ -28,6 +28,10 @@ public class PaymentServiceImpl implements PaymentService {
     private final UserRepository userRepository;
     private final String razorpayKeySecret;
 
+    public PaymentServiceImpl(PaymentRepository paymentRepository, UserRepository userRepository) {
+        this(paymentRepository, userRepository, "");
+    }
+
     public PaymentServiceImpl(PaymentRepository paymentRepository,
                               UserRepository userRepository,
                               @Value("${razorpay.key-secret:}") String razorpayKeySecret) {
