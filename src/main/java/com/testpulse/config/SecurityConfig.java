@@ -2,6 +2,7 @@ package com.testpulse.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -26,15 +27,29 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                    .requestMatchers("/api/auth/change-password").authenticated()
                         .requestMatchers(
                                 "/api/auth/**",
-                            "/api/**",
+                                "/api/tests/**",
+                                "/api/payment/**",
+                                "/api/config",
                                 "/error",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**",
                                 "/v3/api-docs"
                         ).permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/subscription-plans").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/coupons").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/coupons/validate").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/coupons/calculate").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/subscription-plans").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/subscription-plans/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/subscription-plans/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/coupons").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/coupons/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/api/coupons/**").hasRole("ADMIN")
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

@@ -8,6 +8,8 @@ import com.testpulse.model.difficulty;
 import com.testpulse.repository.TestRepository;
 import com.testpulse.service.TestService;
 import com.testpulse.util.LocalizedTextResolver;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,6 +26,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    @Cacheable(value = "tests", key = "'all:' + #subject + ':' + #searchQuery + ':' + #lang")
     public List<Test> getAllTests(String searchQuery, String subject, String lang) {
         List<Test> tests = (subject != null && !subject.isBlank())
                 ? testRepository.findBySubjectContainingIgnoreCase(subject)
@@ -39,16 +42,23 @@ public class TestServiceImpl implements TestService {
                     .toList();
         }
 
-        return tests.stream().map(test -> applyLanguage(test, lang)).toList();
+        return tests.stream()
+                .filter(Test::isActive)
+                .map(test -> applyLanguage(test, lang))
+                .toList();
     }
 
     @Override
+    @Cacheable(value = "tests", key = "#id + ':' + #lang")
     public Test getTestById(Long id, String lang) {
-        Test test = testRepository.findById(id).orElseThrow(() -> new RuntimeException("Test not found"));
+        Test test = testRepository.findById(id)
+                .filter(Test::isActive)
+                .orElseThrow(() -> new RuntimeException("Test not found"));
         return applyLanguage(test, lang);
     }
 
     @Override
+    @CacheEvict(value = "tests", allEntries = true)
     public Test createCustomTest(String subject, int questionCount, String difficultyLevel, String mode, String lang) {
         String normalizedSubject = subject == null ? "General" : subject.trim();
         String normalizedDifficulty = difficultyLevel == null || difficultyLevel.isBlank() ? "MEDIUM" : difficultyLevel.trim().toUpperCase(Locale.ROOT);
@@ -64,13 +74,14 @@ public class TestServiceImpl implements TestService {
                 .durationMinutes("30")
                 .mode(Modes.valueOf(normalizedMode))
                 .difficulty(difficulty.valueOf(normalizedDifficulty))
-                .testType(TestType.FREE)
+                .testType(TestType.PAID)
                 .build();
 
         return applyLanguage(testRepository.save(test), lang);
     }
 
     @Override
+    @CacheEvict(value = "tests", allEntries = true)
     public List<Test> addTest(List<Test> tests) {
         if (tests == null || tests.isEmpty()) {
             throw new IllegalArgumentException("At least one test is required.");
@@ -85,6 +96,7 @@ public class TestServiceImpl implements TestService {
     }
 
     @Override
+    @CacheEvict(value = "tests", allEntries = true)
     public List<Test> addTestsFromDto(List<CreateTestRequest> requests) {
         if (requests == null || requests.isEmpty()) {
             throw new IllegalArgumentException("At least one test is required.");
@@ -180,5 +192,56 @@ public class TestServiceImpl implements TestService {
             case "science" -> "विज्ञान";
             default -> subject;
         };
+    }
+
+    @Override
+    @CacheEvict(value = "tests", allEntries = true)
+    public Test updateTest(Long id, Test testUpdate) {
+        Test existing = testRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Test not found"));
+
+        if (testUpdate.getTitle() != null && !testUpdate.getTitle().isBlank()) {
+            existing.setTitle(testUpdate.getTitle());
+        }
+        if (testUpdate.getTitleHi() != null) {
+            existing.setTitleHi(testUpdate.getTitleHi());
+        }
+        if (testUpdate.getSubject() != null && !testUpdate.getSubject().isBlank()) {
+            existing.setSubject(testUpdate.getSubject());
+        }
+        if (testUpdate.getSubjectHi() != null) {
+            existing.setSubjectHi(testUpdate.getSubjectHi());
+        }
+        if (testUpdate.getDescription() != null && !testUpdate.getDescription().isBlank()) {
+            existing.setDescription(testUpdate.getDescription());
+        }
+        if (testUpdate.getDescriptionHi() != null) {
+            existing.setDescriptionHi(testUpdate.getDescriptionHi());
+        }
+        if (testUpdate.getDurationMinutes() != null) {
+            existing.setDurationMinutes(testUpdate.getDurationMinutes());
+        }
+        if (testUpdate.getMode() != null) {
+            existing.setMode(testUpdate.getMode());
+        }
+        if (testUpdate.getDifficulty() != null) {
+            existing.setDifficulty(testUpdate.getDifficulty());
+        }
+        if (testUpdate.getTestType() != null) {
+            existing.setTestType(testUpdate.getTestType());
+        }
+        existing.setActive(testUpdate.isActive());
+
+        validateTest(existing);
+        return applyLanguage(testRepository.save(existing), "en");
+    }
+
+    @Override
+    @CacheEvict(value = "tests", allEntries = true)
+    public void deactivateTest(Long id) {
+        Test test = testRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Test not found"));
+        test.setActive(false);
+        testRepository.save(test);
     }
 }

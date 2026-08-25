@@ -1,5 +1,6 @@
 package com.testpulse.model;
 
+import com.testpulse.model.Role;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -37,4 +38,15 @@ public class User {
     @Column(nullable = false)
     @Builder.Default
     private SubscriptionStatus subscriptionStatus = SubscriptionStatus.FREE;
+
+    @Column(name = "subscription_plan")
+    private String subscriptionPlan;
+
+    @Column(name = "subscription_expiry")
+    private LocalDateTime subscriptionExpiry;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private Role role = Role.USER;
 }

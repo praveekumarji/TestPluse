@@ -9,6 +9,10 @@ import com.testpulse.service.QuestionService;
 import com.testpulse.util.LocalizedTextResolver;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,8 +20,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
+import static java.lang.Long.parseLong;
+
 @Service
 public class QuestionServiceImpl implements QuestionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(QuestionServiceImpl.class);
 
     private final QuestionRepository questionRepository;
     private final TestRepository testRepository;
@@ -28,12 +36,17 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Cacheable(value = "questions", key = "#testId + ':' + #lang")
     public List<Question> getQuestionsByTestId(Long testId, String lang) {
         List<Question> questions = questionRepository.findByTest_Id(testId);
-        return questions.stream().map(question -> applyLanguage(question, lang)).toList();
+        return questions.stream()
+                .filter(Question::isActive)
+                .map(question -> applyLanguage(question, lang))
+                .toList();
     }
 
     @Override
+    @CacheEvict(value = "questions", allEntries = true)
     public List<Question> createQuestions(List<Question> questions) {
         if (questions == null || questions.isEmpty()) {
             throw new IllegalArgumentException("At least one question is required.");
@@ -48,6 +61,7 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @CacheEvict(value = "questions", allEntries = true)
     public List<Question> createQuestionsFromDto(List<CreateQuestionRequest> requests) {
         if (requests == null || requests.isEmpty()) {
             throw new IllegalArgumentException("At least one question is required.");
@@ -61,6 +75,58 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @CacheEvict(value = "questions", allEntries = true)
+    public Question updateQuestion(Long id, Question questionUpdate) {
+        Question existing = questionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+
+        if (questionUpdate.getSubject() != null && !questionUpdate.getSubject().isBlank()) {
+            existing.setSubject(questionUpdate.getSubject());
+        }
+        if (questionUpdate.getSubjectHi() != null) {
+            existing.setSubjectHi(questionUpdate.getSubjectHi());
+        }
+        if (questionUpdate.getText() != null && !questionUpdate.getText().isBlank()) {
+            existing.setText(questionUpdate.getText());
+        }
+        if (questionUpdate.getTextHi() != null) {
+            existing.setTextHi(questionUpdate.getTextHi());
+        }
+        if (questionUpdate.getExplanation() != null) {
+            existing.setExplanation(questionUpdate.getExplanation());
+        }
+        if (questionUpdate.getExplanationHi() != null) {
+            existing.setExplanationHi(questionUpdate.getExplanationHi());
+        }
+        if (questionUpdate.getHint() != null) {
+            existing.setHint(questionUpdate.getHint());
+        }
+        if (questionUpdate.getOptions() != null && !questionUpdate.getOptions().isEmpty()) {
+            existing.setOptions(questionUpdate.getOptions());
+        }
+        if (questionUpdate.getOptionsHi() != null) {
+            existing.setOptionsHi(questionUpdate.getOptionsHi());
+        }
+        if (questionUpdate.getCorrectOptionIndex() >= 0 && questionUpdate.getCorrectOptionIndex() < existing.getOptions().size()) {
+            existing.setCorrectOptionIndex(questionUpdate.getCorrectOptionIndex());
+        }
+        existing.setActive(questionUpdate.isActive());
+
+        validateQuestion(existing);
+        return questionRepository.save(existing);
+    }
+
+    @Override
+    @CacheEvict(value = "questions", allEntries = true)
+    public void deactivateQuestion(Long id) {
+        Question question = questionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Question not found"));
+        question.setActive(false);
+        questionRepository.save(question);
+    }
+
+    @Override
+    @CacheEvict(value = "questions", allEntries = true)
     public List<Question> importQuestionsFromExcel(MultipartFile file) {
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("Excel file is required.");
@@ -115,16 +181,21 @@ public class QuestionServiceImpl implements QuestionService {
         String explanation = readString(row, columnMap, "explanation");
         String explanationHi = readString(row, columnMap, "explanationhi");
         String hint = readString(row, columnMap, "hint");
+        String hintHi = readString(row, columnMap, "hinthi");
         String topic = readString(row, columnMap, "topic");
 
         List<String> options = readOptions(row, columnMap, "option");
         List<String> optionsHi = readOptions(row, columnMap, "optionhi");
+
+        logger.debug("Parsing question row {} for testId={}, subject={}, optionCount={}",
+            row.getRowNum(), testId, subject, options == null ? 0 : options.size());
 
         if (options == null || options.size() < 2) {
             throw new IllegalArgumentException("Each question row must have at least two option columns (option1, option2, ...). ");
         }
 
         Integer correctIndex = readInteger(row, columnMap, "correctoptionindex");
+        logger.debug("Parsed correct option index {} for row {}", correctIndex, row.getRowNum());
         if (correctIndex == null) {
             correctIndex = readInteger(row, columnMap, "correctoption");
         }
@@ -132,7 +203,7 @@ public class QuestionServiceImpl implements QuestionService {
             throw new IllegalArgumentException("Each question row must include correctOptionIndex.");
         }
         if (correctIndex < 0 || correctIndex >= options.size()) {
-            throw new IllegalArgumentException("correctOptionIndex is out of range for row with testId=" + testId);
+            throw new IllegalArgumentException("correctOptionIndex is out of range for row with testId=" + testId + correctIndex);
         }
 
         Question question = Question.builder()
@@ -147,6 +218,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .explanation(explanation)
                 .explanationHi(explanationHi)
                 .hint(hint)
+                .hintHi(hintHi)
                 .build();
 
         question.setTestId(testId);
@@ -191,20 +263,35 @@ public class QuestionServiceImpl implements QuestionService {
         return cell == null ? null : cell.toString().trim();
     }
 
+
     private Long readLong(Row row, Map<String, Integer> columnMap, String columnName) {
-        String value = readString(row, columnMap, columnName);
+        Integer colIndex = columnMap.get(columnName);
+        if (colIndex == null) return null;
+
+        Cell cell = row.getCell(colIndex);
+        if (cell == null) return null;
+
+        DataFormatter formatter = new DataFormatter();
+        String value = formatter.formatCellValue(cell);
         if (value == null || value.isBlank()) {
             return null;
         }
         try {
-            return Long.parseLong(value.trim());
+            return parseLong(value.trim());
         } catch (NumberFormatException ex) {
-            throw new IllegalArgumentException("Column '" + columnName + "' must contain a valid number.");
+            throw new IllegalArgumentException("Column '" + columnName + "' must contain a valid number value='" + value + "'.");
         }
     }
 
     private Integer readInteger(Row row, Map<String, Integer> columnMap, String columnName) {
-        String value = readString(row, columnMap, columnName);
+        Integer colIndex = columnMap.get(columnName);
+        if (colIndex == null) return null;
+
+        Cell cell = row.getCell(colIndex);
+        if (cell == null) return null;
+
+        DataFormatter formatter = new DataFormatter();
+        String value = formatter.formatCellValue(cell);
         if (value == null || value.isBlank()) {
             return null;
         }
@@ -268,6 +355,7 @@ public class QuestionServiceImpl implements QuestionService {
                 .explanation(request.getExplanation())
                 .explanationHi(request.getExplanationHi())
                 .hint(request.getHint())
+                .hintHi(request.getHintHi())
                 .build();
 
         question.setTestId(request.getTestId());
@@ -321,6 +409,7 @@ public class QuestionServiceImpl implements QuestionService {
         question.setText(LocalizedTextResolver.resolve(question.getText(), question.getTextHi(), lang));
         question.setSubject(LocalizedTextResolver.resolve(question.getSubject(), question.getSubjectHi(), lang));
         question.setExplanation(LocalizedTextResolver.resolve(question.getExplanation(), question.getExplanationHi(), lang));
+        question.setHint(LocalizedTextResolver.resolve(question.getHint(), question.getHintHi(), lang));
         question.setOptions(LocalizedTextResolver.resolveList(question.getOptions(), question.getOptionsHi(), lang));
         return question;
     }

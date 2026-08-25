@@ -1,14 +1,19 @@
 package com.testpulse.controller;
 
 import com.testpulse.dto.AuthResponse;
+import com.testpulse.dto.ChangePasswordRequest;
 import com.testpulse.dto.CreateUserRequest;
+import com.testpulse.dto.ForgotPasswordRequest;
+import com.testpulse.dto.ResetPasswordRequest;
 import com.testpulse.dto.UserResponse;
 import com.testpulse.model.SubscriptionStatus;
 import com.testpulse.model.User;
+import com.testpulse.service.PasswordResetService;
 import com.testpulse.service.UserService;
 import com.testpulse.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -19,9 +24,11 @@ import java.util.Optional;
 public class AuthController {
 
     private final UserService userService;
+    private final PasswordResetService passwordResetService;
 
-    public AuthController(UserService userService) {
+    public AuthController(UserService userService, PasswordResetService passwordResetService) {
         this.userService = userService;
+        this.passwordResetService = passwordResetService;
     }
 
     @PostMapping("/register")
@@ -33,7 +40,7 @@ public class AuthController {
             @RequestParam(defaultValue = "en") String preferredLanguage) {
         try {
             User user = userService.registerUser(email, mobileNumber, password, fullName, preferredLanguage);
-            String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber());
+            String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber(), user.getRole().name());
             return ResponseEntity.ok(AuthResponse.builder()
                     .token(token)
                     .user(toUserResponse(user))
@@ -76,7 +83,7 @@ public class AuthController {
             user.setSubscriptionStatus("PAID".equalsIgnoreCase(subscriptionStatus)
                     ? SubscriptionStatus.PAID
                     : SubscriptionStatus.FREE);
-            String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber());
+            String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber(), user.getRole().name());
             return ResponseEntity.ok(AuthResponse.builder()
                     .token(token)
                     .user(toUserResponse(user))
@@ -91,7 +98,7 @@ public class AuthController {
         try {
             Optional<User> user = userService.login(mobileNumber, password);
             if (user.isPresent()) {
-                String token = JwtUtil.generateToken(user.get().getId(), user.get().getMobileNumber());
+                String token = JwtUtil.generateToken(user.get().getId(), user.get().getMobileNumber(), user.get().getRole().name());
                 return ResponseEntity.ok(AuthResponse.builder()
                         .token(token)
                         .user(toUserResponse(user.get()))
@@ -99,6 +106,50 @@ public class AuthController {
             }
             return ResponseEntity.status(401).body("Invalid mobile number or password.");
         } catch (Exception ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        try {
+            passwordResetService.sendOtp(request);
+            return ResponseEntity.ok(Map.of("message", "Password reset OTP sent to your email."));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        try {
+            passwordResetService.resetPassword(request);
+            return ResponseEntity.ok(Map.of("message", "Password reset successfully."));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        try {
+            if (request == null) {
+                throw new IllegalArgumentException("Password payload cannot be null.");
+            }
+
+            String subject = SecurityContextHolder.getContext().getAuthentication().getName();
+            userService.changePassword(
+                    Long.valueOf(subject),
+                    request.getCurrentPassword(),
+                    request.getNewPassword()
+            );
+            return ResponseEntity.ok(Map.of(
+                    "message", "Password changed successfully",
+                    "status", "SUCCESS"
+            ));
+        } catch (NumberFormatException ex) {
+            return ResponseEntity.status(401).body("Valid authentication is required.");
+        } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
@@ -124,6 +175,8 @@ public class AuthController {
                 .fullName(user.getFullName())
                 .preferredLanguage(user.getPreferredLanguage())
                 .subscriptionStatus(user.getSubscriptionStatus())
+                .subscriptionPlan(user.getSubscriptionPlan())
+                .subscriptionExpiry(user.getSubscriptionExpiry())
                 .build();
     }
 }

@@ -27,4 +27,10 @@ public interface TestService {
     List<Test> addTest(List<Test> tests);
 
     List<Test> addTestsFromDto(List<CreateTestRequest> requests);
+
+    Test updateTest(Long id, Test test);
+
+    void deactivateTest(Long id);
+
+    //void deleteTest(Long id);
 }
