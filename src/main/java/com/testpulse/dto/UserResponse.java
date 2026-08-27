@@ -19,4 +19,6 @@ public class UserResponse {
     private SubscriptionStatus subscriptionStatus;
     private String subscriptionPlan;
     private java.time.LocalDateTime subscriptionExpiry;
+    private boolean hasUsedTrial;
+    private String message;
 }

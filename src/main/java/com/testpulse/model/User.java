@@ -45,6 +45,10 @@ public class User {
     @Column(name = "subscription_expiry")
     private LocalDateTime subscriptionExpiry;
 
+    @Column(name = "has_used_trial", nullable = false)
+    @Builder.Default
+    private boolean hasUsedTrial = false;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default

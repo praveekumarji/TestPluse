@@ -37,9 +37,10 @@ public class AuthController {
             @RequestParam String mobileNumber,
             @RequestParam String password,
             @RequestParam String fullName,
-            @RequestParam(defaultValue = "en") String preferredLanguage) {
+            @RequestParam(defaultValue = "en") String preferredLanguage,
+            @RequestParam(required = false) String deviceHash) {
         try {
-            User user = userService.registerUser(email, mobileNumber, password, fullName, preferredLanguage);
+            User user = userService.registerUser(email, mobileNumber, password, fullName, preferredLanguage, deviceHash);
             String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber(), user.getRole().name());
             return ResponseEntity.ok(AuthResponse.builder()
                     .token(token)
@@ -77,12 +78,13 @@ public class AuthController {
                     request.getMobileNumber(),
                     request.getPassword(),
                     request.getFullName(),
-                    request.getPreferredLanguage() == null ? "en" : request.getPreferredLanguage()
+                        request.getPreferredLanguage() == null ? "en" : request.getPreferredLanguage(),
+                        request.getDeviceHash()
             );
 
-            user.setSubscriptionStatus("PAID".equalsIgnoreCase(subscriptionStatus)
-                    ? SubscriptionStatus.PAID
-                    : SubscriptionStatus.FREE);
+                    if ("PAID".equalsIgnoreCase(subscriptionStatus)) {
+                    user.setSubscriptionStatus(SubscriptionStatus.PAID);
+                    }
             String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber(), user.getRole().name());
             return ResponseEntity.ok(AuthResponse.builder()
                     .token(token)
@@ -177,6 +179,8 @@ public class AuthController {
                 .subscriptionStatus(user.getSubscriptionStatus())
                 .subscriptionPlan(user.getSubscriptionPlan())
                 .subscriptionExpiry(user.getSubscriptionExpiry())
+                .hasUsedTrial(user.isHasUsedTrial())
+                .message(user.isHasUsedTrial() ? null : "A trial was already used on this device.")
                 .build();
     }
 }
