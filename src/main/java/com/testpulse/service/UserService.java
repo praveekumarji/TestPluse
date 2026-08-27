@@ -17,6 +17,8 @@ public interface UserService {
 
     Optional<User> findByEmail(String email);
 
+    boolean existsByEmail(String email);
+
     Optional<User> findByMobileNumber(String mobileNumber);
 
     Optional<User> findById(Long id);

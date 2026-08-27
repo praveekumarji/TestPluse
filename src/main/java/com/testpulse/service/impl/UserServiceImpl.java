@@ -108,7 +108,14 @@ public class UserServiceImpl implements UserService {
     @Override
     @Cacheable(value = "users", key = "'email:' + #email")
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(normalizeEmail(email)).map(this::expireTrialIfNeeded);
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        return normalizedEmail != null && !normalizedEmail.isBlank()
+                && userRepository.existsByEmail(normalizedEmail);
     }
 
     @Override
@@ -244,6 +251,13 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         return mobileNumber.trim();
+    }
+
+    private String normalizeEmail(String email) {
+        if (email == null) {
+            return null;
+        }
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 
     private String normalizeDeviceHash(String deviceHash) {
