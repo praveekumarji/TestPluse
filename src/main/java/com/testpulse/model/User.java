@@ -19,7 +19,7 @@ public class User {
     @Column(nullable = true, unique = true)
     private String email;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true, unique = true)
     private String mobileNumber;
 
     @Column(nullable = false)
@@ -27,6 +27,20 @@ public class User {
 
     @Column(nullable = false)
     private String fullName;
+
+    @Column(name = "avatar_url")
+    private String avatarUrl;
+
+    @Column(name = "is_email_verified", nullable = false)
+    @Builder.Default
+    private boolean isEmailVerified = false;
+
+    @Column(name = "auth_provider", length = 30)
+    @Builder.Default
+    private String authProvider = "LOCAL";
+
+    @Column(name = "target_exam")
+    private String targetExam;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
@@ -48,6 +62,12 @@ public class User {
     @Column(name = "has_used_trial", nullable = false)
     @Builder.Default
     private boolean hasUsedTrial = false;
+
+    @Column(name = "google_subject", unique = true)
+    private String googleSubject;
+
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

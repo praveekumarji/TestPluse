@@ -15,6 +15,12 @@ public class UserResponse {
     private String email;
     private String mobileNumber;
     private String fullName;
+    private String avatarUrl;
+    private boolean isEmailVerified;
+    private String authProvider;
+    private String role;
+    private String targetExam;
+    private java.time.LocalDateTime createdAt;
     private String preferredLanguage;
     private SubscriptionStatus subscriptionStatus;
     private String subscriptionPlan;
