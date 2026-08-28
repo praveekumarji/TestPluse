@@ -16,6 +16,6 @@ public class GoogleAuthRequest {
 
     private String mobileNumber;
     private String deviceHash;
-    private String preferredLanguage = "en";
+    private String preferredLanguage = "hi";
     private String targetExam;
 }
