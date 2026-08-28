@@ -156,6 +156,8 @@ public class CouponServiceImpl implements CouponService {
         long discountAmountInPaise = calculateDiscountAmount(coupon, currentAmountInPaise);
         long finalAmountInPaise = Math.max(0, currentAmountInPaise - discountAmountInPaise);
 
+        /* don't want to save coupon usage here because we want to save it only after successful payment
+
         if (userId != null && !userId.isBlank()) {
             couponUsageRepository.save(CouponUsage.builder()
                     .couponCode(normalizedCode)
@@ -163,7 +165,7 @@ public class CouponServiceImpl implements CouponService {
                     .usedAt(LocalDateTime.now())
                     .planId(planId)
                     .build());
-        }
+        }*/
 
         String message = String.format("Coupon '%s' applied! You saved ₹%s", coupon.getCode(), formatRupees(discountAmountInPaise));
         return CouponApplyResponse.builder()

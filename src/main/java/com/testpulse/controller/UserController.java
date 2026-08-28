@@ -8,6 +8,8 @@ import com.testpulse.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -24,6 +26,23 @@ public class UserController {
                 .map(this::toUserResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/by-email")
+    public ResponseEntity<UserResponse> getUserByEmail(@RequestParam String email) {
+        return userService.findByEmail(email)
+                .map(this::toUserResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/email-exists")
+    public ResponseEntity<Map<String, Object>> checkEmailExists(@RequestParam String email) {
+        String normalizedEmail = email == null ? "" : email.trim().toLowerCase();
+        return ResponseEntity.ok(Map.of(
+                "email", normalizedEmail,
+                "exists", userService.existsByEmail(email)
+        ));
     }
 
     @PutMapping("/{id}/language")
@@ -74,6 +93,9 @@ public class UserController {
                 .fullName(user.getFullName())
                 .preferredLanguage(user.getPreferredLanguage())
                 .subscriptionStatus(user.getSubscriptionStatus())
+                .subscriptionPlan(user.getSubscriptionPlan())
+                .subscriptionExpiry(user.getSubscriptionExpiry())
+                .hasUsedTrial(user.isHasUsedTrial())
                 .build();
     }
 }

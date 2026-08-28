@@ -15,6 +15,7 @@ public class CreateUserRequest {
     private String password;
     private String fullName;
     private String preferredLanguage;
+    private String deviceHash;
     @Builder.Default
     private String subscriptionStatus = "FREE";
 }
