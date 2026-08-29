@@ -162,7 +162,9 @@ public class GoogleAuthService {
             String subject = payload.path("sub").asText(null);
             String email = payload.path("email").asText(null);
             String emailVerified = payload.path("email_verified").asText("");
+            log.info("Google ID token payload: subject={}, email={}, email_verified={}", subject, email, emailVerified);
             long expiresIn = payload.path("expires_in").asLong(-1);
+            log.info("Google ID token expires in: {} seconds", expiresIn);
             if (subject == null || email == null || expiresIn <= 0) {
                 throw new IllegalArgumentException("Invalid or expired Google ID token.");
             }
