@@ -59,3 +59,109 @@ This generated password is for development use only. Your security configuration
 2026-08-29T15:38:44.378+05:30  INFO 10500 --- [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
 2026-08-29T15:38:44.380+05:30  INFO 10500 --- [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
 2026-08-29T15:38:45.595+05:30  INFO 10500 --- [http-nio-8081-exec-8] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 908 ms
+2026-08-29T16:00:32.066+05:30  INFO 10500 --- [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-29T16:00:32.071+05:30  INFO 10500 --- [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-29T16:00:32.077+05:30  INFO 10500 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-29T16:00:32.080+05:30  INFO 10500 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-08-29T16:00:32.081+05:30  INFO 10500 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-08-29T16:00:39.601+05:30  INFO 20420 --- [main] com.testpulse.TestPluseApplication       : Starting TestPluseApplication using Java 25 with PID 20420 (E:\TestPluse\target\classes started by Praveen in E:\TestPluse)
+2026-08-29T16:00:39.604+05:30  INFO 20420 --- [main] com.testpulse.TestPluseApplication       : The following 1 profile is active: "dev"
+2026-08-29T16:00:40.760+05:30  INFO 20420 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-29T16:00:40.867+05:30  INFO 20420 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 96 ms. Found 14 JPA repository interfaces.
+2026-08-29T16:00:41.522+05:30  INFO 20420 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-08-29T16:00:41.537+05:30  INFO 20420 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-29T16:00:41.538+05:30  INFO 20420 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.14]
+2026-08-29T16:00:41.612+05:30  INFO 20420 --- [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1950 ms
+2026-08-29T16:00:41.799+05:30  INFO 20420 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-29T16:00:41.859+05:30  INFO 20420 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 7.1.8.Final
+2026-08-29T16:00:42.272+05:30  INFO 20420 --- [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-29T16:00:42.302+05:30  INFO 20420 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-29T16:00:42.427+05:30  INFO 20420 --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7ec8db0c
+2026-08-29T16:00:42.429+05:30  INFO 20420 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-29T16:00:42.463+05:30  WARN 20420 --- [main] org.hibernate.dialect.Dialect            : HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2026-08-29T16:00:42.467+05:30  WARN 20420 --- [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-29T16:00:42.482+05:30  INFO 20420 --- [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://127.0.0.1:3307/testplus?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 5.5.5
+	Default catalog/schema: testplus/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DatasourceConnectionProviderImpl
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-29T16:00:43.611+05:30  INFO 20420 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-29T16:00:43.785+05:30  INFO 20420 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-29T16:00:43.888+05:30  INFO 20420 --- [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-29T16:00:45.486+05:30  WARN 20420 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-08-29T16:00:45.556+05:30  WARN 20420 --- [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 6e0b04f0-c06f-4bad-bea8-89b326193979
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-29T16:00:45.563+05:30  INFO 20420 --- [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-29T16:00:46.111+05:30  INFO 20420 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-08-29T16:00:46.119+05:30  INFO 20420 --- [main] com.testpulse.TestPluseApplication       : Started TestPluseApplication in 7.023 seconds (process running for 7.585)
+2026-08-29T16:02:27.354+05:30  INFO 20420 --- [http-nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-08-29T16:02:27.354+05:30  INFO 20420 --- [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-08-29T16:02:27.355+05:30  INFO 20420 --- [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-08-29T16:02:27.475+05:30  INFO 20420 --- [http-nio-8081-exec-1] c.testpulse.service.GoogleAuthService    : Verifying Google ID token: eyJhbGciOiJSUzI1NiIsImtpZCI6ImYxMGY4NzQwNWE5NzljMWRmMzZkZjI2NjA2NzM0ZjMzY2Q4NWMyNzEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI4NjIyNjY3OTE2NzYtbW82NjBqa21tZmpwcTdpcThscmZkcWVuczJ1bGJoOGYuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI4NjIyNjY3OTE2NzYtc2ljNmJscGRuYXRiOGVxbTVtOGZwam5kc3N2cG5jYmEuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTU3NzM3MDcxOTM4MzkxOTE1MjAiLCJlbWFpbCI6ImtycHJhdmVlbjE5MDJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJQcmF2ZWVuIEt1bWFyIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0pnbTBhTWxOMFBhRmhFamVQRlBIZkVpOEtrN1c5YS1ZN0o0TjQ2d2xscF93blE5aEREPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IlByYXZlZW4iLCJmYW1pbHlfbmFtZSI6Ikt1bWFyIiwiaWF0IjoxNzg3OTk2OTc4LCJleHAiOjE3ODgwMDA1Nzh9.KdnymJY8HnK3KhgYqOfhA4L-WYPnnu4AbM2luulb9kfZQ7pcvmauLM2sGlP_3ckdYz8wAnsh_nyx2o5Lptwv6Jb2McIO4rnW33fFnRFCAzI0QQAUQlHdiiFCOLiUQTyx8PLpbkFgQnVcxPY2-EYtFOKS_j5WPBDIHPNLB1ZFfibdwrZSbDGE89diQJMy3ep7HdyND1boqbDCPGckQ6KPG_pfs2weg1mmLa2BOPz9M434QR0IliQc8CKDv8WvnF2pWwwz0GKDOqs5IaT7Enm88nXwg49yPS9zvu08TlIY0_UZjtxCSYJO48vXQw5E2gseBR81oOln1S8yj-3vJuHwSw
+2026-08-29T16:02:28.260+05:30  INFO 20420 --- [http-nio-8081-exec-1] c.testpulse.service.GoogleAuthService    : Google ID token payload: subject=115773707193839191520, email=krpraveen1902@gmail.com, email_verified=true
+2026-08-29T16:02:28.261+05:30  INFO 20420 --- [http-nio-8081-exec-1] c.testpulse.service.GoogleAuthService    : Google ID token expiration timestamp: 1788000578
+2026-08-29T16:02:55.680+05:30  INFO 20420 --- [http-nio-8081-exec-5] c.testpulse.service.GoogleAuthService    : Verifying Google ID token: eyJhbGciOiJSUzI1NiIsImtpZCI6ImYxMGY4NzQwNWE5NzljMWRmMzZkZjI2NjA2NzM0ZjMzY2Q4NWMyNzEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmdvb2dsZS5jb20iLCJhenAiOiI4NjIyNjY3OTE2NzYtbW82NjBqa21tZmpwcTdpcThscmZkcWVuczJ1bGJoOGYuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJhdWQiOiI4NjIyNjY3OTE2NzYtc2ljNmJscGRuYXRiOGVxbTVtOGZwam5kc3N2cG5jYmEuYXBwcy5nb29nbGV1c2VyY29udGVudC5jb20iLCJzdWIiOiIxMTU3NzM3MDcxOTM4MzkxOTE1MjAiLCJlbWFpbCI6ImtycHJhdmVlbjE5MDJAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsIm5hbWUiOiJQcmF2ZWVuIEt1bWFyIiwicGljdHVyZSI6Imh0dHBzOi8vbGgzLmdvb2dsZXVzZXJjb250ZW50LmNvbS9hL0FDZzhvY0pnbTBhTWxOMFBhRmhFamVQRlBIZkVpOEtrN1c5YS1ZN0o0TjQ2d2xscF93blE5aEREPXM5Ni1jIiwiZ2l2ZW5fbmFtZSI6IlByYXZlZW4iLCJmYW1pbHlfbmFtZSI6Ikt1bWFyIiwiaWF0IjoxNzg3OTk2OTc4LCJleHAiOjE3ODgwMDA1Nzh9.KdnymJY8HnK3KhgYqOfhA4L-WYPnnu4AbM2luulb9kfZQ7pcvmauLM2sGlP_3ckdYz8wAnsh_nyx2o5Lptwv6Jb2McIO4rnW33fFnRFCAzI0QQAUQlHdiiFCOLiUQTyx8PLpbkFgQnVcxPY2-EYtFOKS_j5WPBDIHPNLB1ZFfibdwrZSbDGE89diQJMy3ep7HdyND1boqbDCPGckQ6KPG_pfs2weg1mmLa2BOPz9M434QR0IliQc8CKDv8WvnF2pWwwz0GKDOqs5IaT7Enm88nXwg49yPS9zvu08TlIY0_UZjtxCSYJO48vXQw5E2gseBR81oOln1S8yj-3vJuHwSw
+2026-08-29T16:02:55.826+05:30  INFO 20420 --- [http-nio-8081-exec-5] c.testpulse.service.GoogleAuthService    : Google ID token payload: subject=115773707193839191520, email=krpraveen1902@gmail.com, email_verified=true
+2026-08-29T16:02:55.826+05:30  INFO 20420 --- [http-nio-8081-exec-5] c.testpulse.service.GoogleAuthService    : Google ID token expiration timestamp: 1788000578
+2026-08-29T16:05:37.024+05:30  INFO 20420 --- [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-29T16:05:37.030+05:30  INFO 20420 --- [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-29T16:05:37.033+05:30  INFO 20420 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-29T16:05:37.036+05:30  INFO 20420 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-08-29T16:05:37.040+05:30  INFO 20420 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-08-29T16:05:43.449+05:30  INFO 32868 --- [main] com.testpulse.TestPluseApplication       : Starting TestPluseApplication using Java 25 with PID 32868 (E:\TestPluse\target\classes started by Praveen in E:\TestPluse)
+2026-08-29T16:05:43.452+05:30  INFO 32868 --- [main] com.testpulse.TestPluseApplication       : The following 1 profile is active: "dev"
+2026-08-29T16:05:44.659+05:30  INFO 32868 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-08-29T16:05:44.758+05:30  INFO 32868 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 90 ms. Found 14 JPA repository interfaces.
+2026-08-29T16:05:45.404+05:30  INFO 32868 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-08-29T16:05:45.417+05:30  INFO 32868 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-08-29T16:05:45.417+05:30  INFO 32868 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.14]
+2026-08-29T16:05:45.491+05:30  INFO 32868 --- [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 1979 ms
+2026-08-29T16:05:45.693+05:30  INFO 32868 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-08-29T16:05:45.761+05:30  INFO 32868 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 7.1.8.Final
+2026-08-29T16:05:46.387+05:30  INFO 32868 --- [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-08-29T16:05:46.431+05:30  INFO 32868 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-08-29T16:05:46.587+05:30  INFO 32868 --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@7ec8db0c
+2026-08-29T16:05:46.590+05:30  INFO 32868 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-08-29T16:05:46.632+05:30  WARN 32868 --- [main] org.hibernate.dialect.Dialect            : HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2026-08-29T16:05:46.636+05:30  WARN 32868 --- [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-08-29T16:05:46.653+05:30  INFO 32868 --- [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://127.0.0.1:3307/testplus?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 5.5.5
+	Default catalog/schema: testplus/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DatasourceConnectionProviderImpl
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-08-29T16:05:47.942+05:30  INFO 32868 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-08-29T16:05:48.163+05:30  INFO 32868 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-08-29T16:05:48.284+05:30  INFO 32868 --- [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-08-29T16:05:50.199+05:30  WARN 32868 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-08-29T16:05:50.287+05:30  WARN 32868 --- [main] .s.a.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 1ab01c53-f3cd-4e82-b48f-4a2e6683b048
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-08-29T16:05:50.295+05:30  INFO 32868 --- [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-08-29T16:05:51.418+05:30  INFO 32868 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-08-29T16:05:51.429+05:30  INFO 32868 --- [main] com.testpulse.TestPluseApplication       : Started TestPluseApplication in 8.482 seconds (process running for 9.015)
+2026-08-29T16:07:32.506+05:30  INFO 32868 --- [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-08-29T16:07:32.511+05:30  INFO 32868 --- [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-08-29T16:07:32.515+05:30  INFO 32868 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-08-29T16:07:32.518+05:30  INFO 32868 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-08-29T16:07:32.524+05:30  INFO 32868 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

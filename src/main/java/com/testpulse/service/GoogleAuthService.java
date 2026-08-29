@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -163,11 +164,11 @@ public class GoogleAuthService {
             String email = payload.path("email").asText(null);
             String emailVerified = payload.path("email_verified").asText("");
             log.info("Google ID token payload: subject={}, email={}, email_verified={}", subject, email, emailVerified);
-            long expiresIn = payload.path("expires_in").asLong(-1);
-            log.info("Google ID token expires in: {} seconds", expiresIn);
-            if (subject == null || email == null || expiresIn <= 0) {
-                throw new IllegalArgumentException("Invalid or expired Google ID token.");
-            }
+
+            validateGoogleTokenPayload(payload);
+
+            long exp = payload.path("exp").asLong(-1L);
+            log.info("Google ID token expiration timestamp: {}", exp > 0 ? exp : "not provided");
             return new GoogleTokenInfo(
                     subject,
                     email,
@@ -180,6 +181,27 @@ public class GoogleAuthService {
                 throw (IllegalArgumentException) ex;
             }
             throw new IllegalArgumentException("Invalid Google ID token.", ex);
+        }
+    }
+
+    public static void validateGoogleTokenPayload(JsonNode payload) {
+        String subject = payload.path("sub").asText(null);
+        String email = payload.path("email").asText(null);
+        if (subject == null || subject.isBlank()) {
+            throw new IllegalArgumentException("Invalid Google ID token: missing subject.");
+        }
+        if (email == null || email.isBlank()) {
+            throw new IllegalArgumentException("Invalid Google ID token: missing email.");
+        }
+
+        long exp = payload.path("exp").asLong(-1L);
+        if (exp > 0 && exp <= Instant.now().getEpochSecond()) {
+            throw new IllegalArgumentException("Invalid or expired Google ID token.");
+        }
+
+        long expiresIn = payload.path("expires_in").asLong(-1L);
+        if (expiresIn == 0) {
+            throw new IllegalArgumentException("Invalid or expired Google ID token.");
         }
     }
 
