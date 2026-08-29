@@ -11,6 +11,7 @@ import com.testpulse.model.User;
 import com.testpulse.repository.TrialDeviceRepository;
 import com.testpulse.repository.UserRepository;
 import com.testpulse.util.JwtUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class GoogleAuthService {
     private static final String TRIAL_PLAN = "TRIAL_3_DAY";
@@ -145,6 +147,7 @@ public class GoogleAuthService {
 
     private GoogleTokenInfo verify(String idToken) {
         try {
+            log.info("Verifying Google ID token: {}", idToken);
             String encodedToken = URLEncoder.encode(idToken, StandardCharsets.UTF_8);
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create("https://oauth2.googleapis.com/tokeninfo?id_token=" + encodedToken))
