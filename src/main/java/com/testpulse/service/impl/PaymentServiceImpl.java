@@ -9,6 +9,7 @@ import com.testpulse.dto.PaymentRecordResponse;
 import com.testpulse.repository.PaymentRepository;
 import com.testpulse.repository.UserRepository;
 import com.testpulse.service.PaymentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Locale;
 
+@Slf4j
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
@@ -94,6 +96,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     @Transactional
     public PaymentRecordResponse recordPayment(PaymentRecordRequest request) {
+        log.info("Recording payment: {}", request);
         if (request == null || request.getUserId() == null) {
             throw new IllegalArgumentException("User ID is required.");
         }
@@ -108,6 +111,7 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         String requestedStatus = request.getPaymentStatus().trim().toUpperCase(Locale.ROOT);
+        log.info("Requested payment status: {}", requestedStatus);
         PaymentStatus storedStatus = switch (requestedStatus) {
             case "INITIATED" -> PaymentStatus.PENDING;
             case "SUCCESS" -> PaymentStatus.SUCCESS;
@@ -122,6 +126,8 @@ public class PaymentServiceImpl implements PaymentService {
 
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        log.info("Storing payment record for userId: {}, planId: {}, amountInPaise: {}, status: {}",
+                user.getId(), request.getPlanId(), request.getAmountInPaise(), storedStatus);
         Payment payment = Payment.builder()
                 .user(user)
                 .planName(request.getPlanTitle() == null || request.getPlanTitle().isBlank()
@@ -145,12 +151,15 @@ public class PaymentServiceImpl implements PaymentService {
                 .paidAt(storedStatus == PaymentStatus.SUCCESS ? LocalDateTime.now() : null)
                 .build();
         paymentRepository.save(payment);
-
+        log.info("Payment record stored successfully for userId: {}, paymentId: {}", user.getId(), payment.getId());
         if (storedStatus == PaymentStatus.SUCCESS) {
+            log.info("Updating user subscription for userId: {}", user.getId());
             user.setSubscriptionStatus(SubscriptionStatus.PAID);
+            log.info("seting user subscription status to PAID for userId: {}", user.getId());
             user.setSubscriptionPlan(request.getPlanCode() == null ? request.getPlanId() : request.getPlanCode());
             user.setSubscriptionExpiry(LocalDateTime.now().plusDays(request.getDurationDays()));
             userRepository.save(user);
+            log.info("User subscription updated successfully for userId: {}", user.getId());
         }
 
         return PaymentRecordResponse.builder()
@@ -167,11 +176,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     private void verifyRazorpaySignature(PaymentRecordRequest request) {
         if (razorpayKeySecret == null || razorpayKeySecret.isBlank()) {
+            log.info("Razorpay key secret is not configured.");
             throw new IllegalStateException("Razorpay key secret is not configured.");
         }
         if (request.getRazorpayOrderId() == null || request.getRazorpayOrderId().isBlank()
                 || request.getRazorpayPaymentId() == null || request.getRazorpayPaymentId().isBlank()
                 || request.getRazorpaySignature() == null || request.getRazorpaySignature().isBlank()) {
+            log.info("Razorpay order ID, payment ID, or signature is missing.");
             throw new IllegalArgumentException("Razorpay order ID, payment ID, and signature are required for successful payments.");
         }
 
@@ -186,8 +197,10 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new IllegalArgumentException("Invalid Razorpay payment signature.");
             }
         } catch (IllegalArgumentException ex) {
+            log.info("Razorpay signature verification failed: {}", ex.getMessage());
             throw ex;
         } catch (Exception ex) {
+            log.info("Error while verifying Razorpay payment signature: {}", ex.getMessage());
             throw new IllegalStateException("Unable to verify Razorpay payment signature.", ex);
         }
     }
