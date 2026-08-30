@@ -7,12 +7,14 @@ import com.testpulse.dto.PaymentSuccessRequest;
 import com.testpulse.model.Payment;
 import com.testpulse.model.PaymentStatus;
 import com.testpulse.service.PaymentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import jakarta.validation.Valid;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
@@ -52,6 +54,7 @@ public class PaymentController {
     @PostMapping("/record-success")
     public ResponseEntity<?> recordSuccess(@Valid @RequestBody PaymentRecordRequest request) {
         try {
+            log.info("Recording payment success :{}", request.toString());
             return ResponseEntity.ok(paymentService.recordPayment(request));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
@@ -75,6 +78,7 @@ public class PaymentController {
     @PostMapping("/records")
     public ResponseEntity<?> recordPayment(@Valid @RequestBody PaymentRecordRequest request) {
         try {
+            log.info("Recording payment :{}", request.toString());
             return ResponseEntity.ok(paymentService.recordPayment(request));
         } catch (IllegalArgumentException ex) {
             return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));

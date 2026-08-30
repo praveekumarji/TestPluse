@@ -10,9 +10,14 @@ public interface UserService {
 
     User registerUser(String email, String mobileNumber, String password, String fullName, String preferredLanguage);
 
+    User registerUser(String email, String mobileNumber, String password, String fullName,
+                      String preferredLanguage, String deviceHash);
+
     User registerUser(String email, String password, String fullName, String preferredLanguage);
 
     Optional<User> findByEmail(String email);
+
+    boolean existsByEmail(String email);
 
     Optional<User> findByMobileNumber(String mobileNumber);
 

@@ -4,11 +4,13 @@ import com.testpulse.dto.AuthResponse;
 import com.testpulse.dto.ChangePasswordRequest;
 import com.testpulse.dto.CreateUserRequest;
 import com.testpulse.dto.ForgotPasswordRequest;
+import com.testpulse.dto.GoogleAuthRequest;
 import com.testpulse.dto.ResetPasswordRequest;
 import com.testpulse.dto.UserResponse;
 import com.testpulse.model.SubscriptionStatus;
 import com.testpulse.model.User;
 import com.testpulse.service.PasswordResetService;
+import com.testpulse.service.GoogleAuthService;
 import com.testpulse.service.UserService;
 import com.testpulse.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
@@ -25,10 +27,13 @@ public class AuthController {
 
     private final UserService userService;
     private final PasswordResetService passwordResetService;
+    private final GoogleAuthService googleAuthService;
 
-    public AuthController(UserService userService, PasswordResetService passwordResetService) {
+    public AuthController(UserService userService, PasswordResetService passwordResetService,
+                          GoogleAuthService googleAuthService) {
         this.userService = userService;
         this.passwordResetService = passwordResetService;
+        this.googleAuthService = googleAuthService;
     }
 
     @PostMapping("/register")
@@ -37,11 +42,15 @@ public class AuthController {
             @RequestParam String mobileNumber,
             @RequestParam String password,
             @RequestParam String fullName,
-            @RequestParam(defaultValue = "en") String preferredLanguage) {
+            @RequestParam(defaultValue = "en") String preferredLanguage,
+            @RequestParam(required = false) String deviceHash) {
         try {
-            User user = userService.registerUser(email, mobileNumber, password, fullName, preferredLanguage);
+            User user = userService.registerUser(email, mobileNumber, password, fullName, preferredLanguage, deviceHash);
             String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber(), user.getRole().name());
             return ResponseEntity.ok(AuthResponse.builder()
+                    .success(true)
+                    .message("Registration successful")
+                    .isNewUser(true)
                     .token(token)
                     .user(toUserResponse(user))
                     .build());
@@ -77,14 +86,18 @@ public class AuthController {
                     request.getMobileNumber(),
                     request.getPassword(),
                     request.getFullName(),
-                    request.getPreferredLanguage() == null ? "en" : request.getPreferredLanguage()
+                        request.getPreferredLanguage() == null ? "en" : request.getPreferredLanguage(),
+                        request.getDeviceHash()
             );
 
-            user.setSubscriptionStatus("PAID".equalsIgnoreCase(subscriptionStatus)
-                    ? SubscriptionStatus.PAID
-                    : SubscriptionStatus.FREE);
+                    if ("PAID".equalsIgnoreCase(subscriptionStatus)) {
+                    user.setSubscriptionStatus(SubscriptionStatus.PAID);
+                    }
             String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber(), user.getRole().name());
             return ResponseEntity.ok(AuthResponse.builder()
+                    .success(true)
+                    .message("Registration successful")
+                    .isNewUser(true)
                     .token(token)
                     .user(toUserResponse(user))
                     .build());
@@ -100,6 +113,9 @@ public class AuthController {
             if (user.isPresent()) {
                 String token = JwtUtil.generateToken(user.get().getId(), user.get().getMobileNumber(), user.get().getRole().name());
                 return ResponseEntity.ok(AuthResponse.builder()
+                    .success(true)
+                    .message("Authentication successful")
+                    .isNewUser(false)
                         .token(token)
                         .user(toUserResponse(user.get()))
                         .build());
@@ -107,6 +123,15 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid mobile number or password.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/google")
+    public ResponseEntity<?> google(@Valid @RequestBody GoogleAuthRequest request) {
+        try {
+            return ResponseEntity.ok(googleAuthService.authenticate(request));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
         }
     }
 
@@ -177,6 +202,8 @@ public class AuthController {
                 .subscriptionStatus(user.getSubscriptionStatus())
                 .subscriptionPlan(user.getSubscriptionPlan())
                 .subscriptionExpiry(user.getSubscriptionExpiry())
+                .hasUsedTrial(user.isHasUsedTrial())
+                .message(user.isHasUsedTrial() ? null : "A trial was already used on this device.")
                 .build();
     }
 }
