@@ -26,7 +26,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
 @Service
@@ -38,11 +38,13 @@ public class GoogleAuthService {
     private final UserRepository userRepository;
     private final TrialDeviceRepository trialDeviceRepository;
     private final PasswordEncoder passwordEncoder;
+    private final WelcomeEmailService welcomeEmailService;
     private final int trialDurationDays;
 
     public GoogleAuthService(UserRepository userRepository,
                              TrialDeviceRepository trialDeviceRepository,
                              PasswordEncoder passwordEncoder,
+                             WelcomeEmailService welcomeEmailService,
                              @Value("${subscription.trial-days:3}") int trialDurationDays) {
         this.httpClient = HttpClient.newBuilder()
             .connectTimeout(java.time.Duration.ofSeconds(5))
@@ -50,6 +52,7 @@ public class GoogleAuthService {
         this.userRepository = userRepository;
         this.trialDeviceRepository = trialDeviceRepository;
         this.passwordEncoder = passwordEncoder;
+        this.welcomeEmailService = welcomeEmailService;
         this.trialDurationDays = trialDurationDays;
     }
 
@@ -114,14 +117,17 @@ public class GoogleAuthService {
         LocalDateTime now = LocalDateTime.now();
         String displayName = tokenInfo.name();
         String avatarUrl = tokenInfo.picture();
+        String fallbackName = (displayName == null || displayName.isBlank())
+                ? (request.getFullName() == null || request.getFullName().isBlank() ? email : request.getFullName().trim())
+                : displayName;
+        String temporaryPassword = generateTemporaryPassword(fallbackName);
+
         User user = User.builder()
                 .email(email)
             .mobileNumber(request.getMobileNumber() == null || request.getMobileNumber().isBlank()
                 ? null : request.getMobileNumber().trim())
-                .passwordHash(passwordEncoder.encode(UUID.randomUUID().toString()))
-            .fullName(displayName == null || displayName.isBlank()
-                ? (request.getFullName() == null || request.getFullName().isBlank() ? email : request.getFullName().trim())
-                : displayName)
+                .passwordHash(passwordEncoder.encode(temporaryPassword))
+            .fullName(fallbackName)
             .avatarUrl(avatarUrl == null || avatarUrl.isBlank() ? request.getAvatarUrl() : avatarUrl)
             .isEmailVerified(true)
             .authProvider("GOOGLE")
@@ -143,6 +149,7 @@ public class GoogleAuthService {
                     .trialUsedAt(now)
                     .build());
         }
+        welcomeEmailService.sendWelcomeEmailAsync(saved, temporaryPassword);
         return saved;
     }
 
@@ -231,6 +238,19 @@ public class GoogleAuthService {
                 .subscriptionExpiry(user.getSubscriptionExpiry())
                 .hasUsedTrial(user.isHasUsedTrial())
                 .build();
+    }
+
+    private String generateTemporaryPassword(String userName) {
+        String cleanName = userName == null ? "user" : userName.trim();
+        cleanName = cleanName.replaceAll("[^a-zA-Z0-9]", "");
+        if (cleanName.length() > 12) {
+            cleanName = cleanName.substring(0, 12);
+        }
+        if (cleanName.isBlank()) {
+            cleanName = "user";
+        }
+        int number = ThreadLocalRandom.current().nextInt(100, 1000);
+        return cleanName + number;
     }
 
     private String normalizeEmail(String email) {

@@ -6,6 +6,7 @@ import com.testpulse.repository.UserRepository;
 import com.testpulse.repository.TrialDeviceRepository;
 import com.testpulse.model.TrialDevice;
 import com.testpulse.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Optional;
 
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     private static final String TRIAL_PLAN = "TRIAL_3_DAY";
@@ -168,9 +170,11 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
+
     @Override
     @CacheEvict(value = "users", key = "'id:' + #userId")
     public User updateSubscriptionStatus(Long userId, SubscriptionStatus status) {
+        log.info("Updating subscription status for userId: {}, new status: {}", userId, status);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         if (status == SubscriptionStatus.TRIAL && user.isHasUsedTrial()) {
@@ -182,6 +186,7 @@ public class UserServiceImpl implements UserService {
             user.setSubscriptionExpiry(LocalDateTime.now().plusDays(trialDurationDays));
         }
         user.setSubscriptionStatus(status == null ? SubscriptionStatus.FREE : status);
+        log.info("Updated subscription status for userId: {}, new status: {}", userId, user.getSubscriptionStatus());
         return userRepository.save(user);
     }
 
@@ -208,13 +213,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Optional<User> login(String mobileNumber, String password) {
-        String normalizedMobile = normalizeMobileNumber(mobileNumber);
-        if (normalizedMobile == null || normalizedMobile.isBlank()) {
+    public Optional<User> login(String identifier, String password) {
+        if (identifier == null || identifier.isBlank() || password == null || password.isBlank()) {
             return Optional.empty();
         }
 
-        return userRepository.findByMobileNumber(normalizedMobile)
+        String normalizedIdentifier = identifier.trim();
+
+        Optional<User> userByMobile = userRepository.findByMobileNumber(normalizedIdentifier)
+                .filter(user -> user.getPasswordHash() != null &&
+                        (passwordEncoder.matches(password, user.getPasswordHash()) ||
+                                user.getPasswordHash().equals(password)))
+                .map(this::expireTrialIfNeeded);
+        if (userByMobile.isPresent()) {
+            return userByMobile;
+        }
+
+        String normalizedEmail = normalizeEmail(normalizedIdentifier);
+        if (normalizedEmail == null || normalizedEmail.isBlank()) {
+            return Optional.empty();
+        }
+
+        return userRepository.findByEmail(normalizedEmail)
                 .filter(user -> user.getPasswordHash() != null &&
                         (passwordEncoder.matches(password, user.getPasswordHash()) ||
                                 user.getPasswordHash().equals(password)))

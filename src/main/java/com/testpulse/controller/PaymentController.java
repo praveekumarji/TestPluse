@@ -51,7 +51,7 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("/record-success")
+    @PostMapping({"/record-success", "/records-success"})
     public ResponseEntity<?> recordSuccess(@Valid @RequestBody PaymentRecordRequest request) {
         try {
             log.info("Recording payment success :{}", request.toString());

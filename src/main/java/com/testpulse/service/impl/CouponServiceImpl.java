@@ -10,6 +10,7 @@ import com.testpulse.repository.CouponRepository;
 import com.testpulse.repository.CouponUsageRepository;
 import com.testpulse.repository.SubscriptionPlanRepository;
 import com.testpulse.service.CouponService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 public class CouponServiceImpl implements CouponService {
 
@@ -115,6 +117,7 @@ public class CouponServiceImpl implements CouponService {
     @Transactional
     public CouponApplyResponse validateAndApplyCoupon(String couponCode, String planId, String userId, long currentAmountInPaise) {
         String normalizedCode = couponCode == null ? null : couponCode.trim().toUpperCase();
+        log.info("Validating coupon code: {}, planId: {}, userId: {}, currentAmountInPaise: {}", normalizedCode, planId, userId, currentAmountInPaise);
         if (normalizedCode == null || normalizedCode.isBlank()) {
             return buildFailure("Invalid or expired coupon code");
         }
@@ -193,9 +196,12 @@ public class CouponServiceImpl implements CouponService {
     }
 
     private long calculateDiscountAmount(Coupon coupon, long planAmount) {
+        log.info("Calculating discount for coupon: {}, planAmount: {}", coupon.getCode(), planAmount);
         if (coupon.getDiscountType() == DiscountType.PERCENTAGE) {
+            log.info("Percentage discount: {}%, calculated discount: {}", coupon.getDiscountValue(), (coupon.getDiscountValue() / 100.0) * planAmount);
             return Math.round((coupon.getDiscountValue() / 100.0) * planAmount);
         }
+        log.info("Fixed discount: {}, calculated discount: {}", coupon.getDiscountValue(), Math.min(coupon.getDiscountValue(), planAmount));
         return Math.min(coupon.getDiscountValue(), planAmount);
     }
 

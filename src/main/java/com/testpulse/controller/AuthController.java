@@ -12,6 +12,7 @@ import com.testpulse.model.User;
 import com.testpulse.service.PasswordResetService;
 import com.testpulse.service.GoogleAuthService;
 import com.testpulse.service.UserService;
+import com.testpulse.service.WelcomeEmailService;
 import com.testpulse.util.JwtUtil;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -28,12 +29,14 @@ public class AuthController {
     private final UserService userService;
     private final PasswordResetService passwordResetService;
     private final GoogleAuthService googleAuthService;
+    private final WelcomeEmailService welcomeEmailService;
 
     public AuthController(UserService userService, PasswordResetService passwordResetService,
-                          GoogleAuthService googleAuthService) {
+                          GoogleAuthService googleAuthService, WelcomeEmailService welcomeEmailService) {
         this.userService = userService;
         this.passwordResetService = passwordResetService;
         this.googleAuthService = googleAuthService;
+        this.welcomeEmailService = welcomeEmailService;
     }
 
     @PostMapping("/register")
@@ -46,6 +49,9 @@ public class AuthController {
             @RequestParam(required = false) String deviceHash) {
         try {
             User user = userService.registerUser(email, mobileNumber, password, fullName, preferredLanguage, deviceHash);
+            if (user.getEmail() != null && !user.getEmail().isBlank()) {
+                welcomeEmailService.sendWelcomeEmailAsync(user, password);
+            }
             String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber(), user.getRole().name());
             return ResponseEntity.ok(AuthResponse.builder()
                     .success(true)
@@ -90,6 +96,10 @@ public class AuthController {
                         request.getDeviceHash()
             );
 
+            if (user.getEmail() != null && !user.getEmail().isBlank()) {
+                welcomeEmailService.sendWelcomeEmailAsync(user, request.getPassword());
+            }
+
                     if ("PAID".equalsIgnoreCase(subscriptionStatus)) {
                     user.setSubscriptionStatus(SubscriptionStatus.PAID);
                     }
@@ -120,7 +130,7 @@ public class AuthController {
                         .user(toUserResponse(user.get()))
                         .build());
             }
-            return ResponseEntity.status(401).body("Invalid mobile number or password.");
+            return ResponseEntity.status(401).body("Invalid email/mobile number or password.");
         } catch (Exception ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
         }
