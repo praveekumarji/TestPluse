@@ -8,7 +8,6 @@ import com.testpulse.model.TrialDevice;
 import com.testpulse.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -108,9 +107,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "users", key = "'email:' + #email")
     public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(normalizeEmail(email)).map(this::expireTrialIfNeeded);
+        return userRepository.findByEmail(normalizeEmail(email)).map(this::expireSubscriptionIfNeeded);
     }
 
     @Override
@@ -121,15 +119,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Cacheable(value = "users", key = "'mobile:' + #mobileNumber")
     public Optional<User> findByMobileNumber(String mobileNumber) {
-        return userRepository.findByMobileNumber(normalizeMobileNumber(mobileNumber));
+        return userRepository.findByMobileNumber(normalizeMobileNumber(mobileNumber))
+            .map(this::expireSubscriptionIfNeeded);
     }
 
     @Override
-    @Cacheable(value = "users", key = "'id:' + #id")
     public Optional<User> findById(Long id) {
-        return userRepository.findById(id).map(this::expireTrialIfNeeded);
+        return userRepository.findById(id).map(this::expireSubscriptionIfNeeded);
     }
 
     @Override
@@ -138,6 +135,22 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setPreferredLanguage(normalizeLanguage(language));
+        return userRepository.save(user);
+    }
+
+    @Override
+    @CacheEvict(value = "users", allEntries = true)
+    public User updateMobileNumber(Long userId, String mobileNumber) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String normalizedMobile = normalizeMobileNumber(mobileNumber);
+        if (userRepository.existsByMobileNumber(normalizedMobile)
+                && !normalizedMobile.equals(user.getMobileNumber())) {
+            throw new IllegalArgumentException("User with this mobile number already exists.");
+        }
+
+        user.setMobileNumber(normalizedMobile);
         return userRepository.save(user);
     }
 
@@ -224,7 +237,7 @@ public class UserServiceImpl implements UserService {
                 .filter(user -> user.getPasswordHash() != null &&
                         (passwordEncoder.matches(password, user.getPasswordHash()) ||
                                 user.getPasswordHash().equals(password)))
-                .map(this::expireTrialIfNeeded);
+                .map(this::expireSubscriptionIfNeeded);
         if (userByMobile.isPresent()) {
             return userByMobile;
         }
@@ -238,16 +251,18 @@ public class UserServiceImpl implements UserService {
                 .filter(user -> user.getPasswordHash() != null &&
                         (passwordEncoder.matches(password, user.getPasswordHash()) ||
                                 user.getPasswordHash().equals(password)))
-                .map(this::expireTrialIfNeeded);
+                .map(this::expireSubscriptionIfNeeded);
     }
 
-    private User expireTrialIfNeeded(User user) {
-        if (user.getSubscriptionStatus() == SubscriptionStatus.TRIAL
+            private User expireSubscriptionIfNeeded(User user) {
+            boolean activeSubscription = user.getSubscriptionStatus() == SubscriptionStatus.TRIAL
+                || user.getSubscriptionStatus() == SubscriptionStatus.PAID
+                || user.getSubscriptionStatus() == SubscriptionStatus.PRIME;
+
+            if (activeSubscription
                 && user.getSubscriptionExpiry() != null
                 && !user.getSubscriptionExpiry().isAfter(LocalDateTime.now())) {
             user.setSubscriptionStatus(SubscriptionStatus.FREE);
-            user.setSubscriptionPlan(null);
-            user.setSubscriptionExpiry(null);
             userRepository.save(user);
         }
         return user;

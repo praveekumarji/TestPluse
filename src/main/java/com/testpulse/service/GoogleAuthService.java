@@ -97,7 +97,7 @@ public class GoogleAuthService {
             if (request.getTargetExam() != null && !request.getTargetExam().isBlank()) {
                 user.setTargetExam(request.getTargetExam().trim());
             }
-            expireTrialIfNeeded(user);
+            expireSubscriptionIfNeeded(user);
             user.setLastLoginAt(LocalDateTime.now());
             user = userRepository.save(user);
         }
@@ -149,6 +149,7 @@ public class GoogleAuthService {
                     .trialUsedAt(now)
                     .build());
         }
+        log.info("New user created with email: {}, trialAvailable: {}, temporaryPassword: {}", email, trialAvailable, temporaryPassword);
         welcomeEmailService.sendWelcomeEmailAsync(saved, temporaryPassword);
         return saved;
     }
@@ -216,13 +217,15 @@ public class GoogleAuthService {
                                    String name, String picture) {
     }
 
-    private void expireTrialIfNeeded(User user) {
-        if (user.getSubscriptionStatus() == SubscriptionStatus.TRIAL
+    private void expireSubscriptionIfNeeded(User user) {
+        boolean activeSubscription = user.getSubscriptionStatus() == SubscriptionStatus.TRIAL
+                || user.getSubscriptionStatus() == SubscriptionStatus.PAID
+                || user.getSubscriptionStatus() == SubscriptionStatus.PRIME;
+
+        if (activeSubscription
                 && user.getSubscriptionExpiry() != null
                 && !user.getSubscriptionExpiry().isAfter(LocalDateTime.now())) {
             user.setSubscriptionStatus(SubscriptionStatus.FREE);
-            user.setSubscriptionPlan(null);
-            user.setSubscriptionExpiry(null);
         }
     }
 
