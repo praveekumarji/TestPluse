@@ -27,6 +27,7 @@ public class WelcomeEmailService {
     @Async
     public void sendWelcomeEmailAsync(User user, String temporaryPassword) {
         try {
+            log.info("Sending welcome email to {}", user.getEmail());
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(fromAddress);

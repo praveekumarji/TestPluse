@@ -21,9 +21,23 @@ public interface UserService {
 
     Optional<User> findByMobileNumber(String mobileNumber);
 
+
+
+
+
+
+
+
+
+
+          
+
+         
     Optional<User> findById(Long id);
 
     User updatePreferredLanguage(Long userId, String language);
+
+    User updateMobileNumber(Long userId, String mobileNumber);
 
     User updateProfile(Long userId, String fullName, String email, String mobileNumber, String preferredLanguage);
 
