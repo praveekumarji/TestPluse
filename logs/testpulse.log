@@ -70,3 +70,4 @@ This generated password is for development use only. Your security configuration
 2026-09-05T13:09:40.573+05:30  INFO 8316 --- [task-1] c.testpulse.service.WelcomeEmailService  : Sending welcome email to praveenkumar.niit001@gmail.com
 2026-09-05T13:09:49.170+05:30  INFO 8316 --- [task-1] c.testpulse.service.WelcomeEmailService  : Welcome email sent successfully to praveenkumar.niit001@gmail.com
 2026-09-05T13:40:47.149+05:30  WARN 8316 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m43s987ms202µs).
+2026-09-05T14:58:22.002+05:30  WARN 8316 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=27m34s87ms796µs700ns).
