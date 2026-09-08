@@ -1,44 +1,20 @@
-2026-09-05T07:46:46.867+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@31a4a27f (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-2026-09-05T07:46:46.882+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@7b03e811 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-2026-09-05T07:46:46.883+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=10h41m45s873ms28µs800ns).
-2026-09-05T07:46:46.885+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@4faefbb0 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-2026-09-05T07:46:46.886+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@673c5777 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-2026-09-05T07:46:46.887+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@835b5c8 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-2026-09-05T07:46:46.888+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@6c9297bf (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-2026-09-05T07:46:46.890+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@54d982e6 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-2026-09-05T07:46:46.890+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@51dbf0e5 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-2026-09-05T07:46:46.891+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@74e594e3 (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-2026-09-05T07:46:46.892+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.PoolBase          : HikariPool-1 - Failed to validate connection com.mysql.cj.jdbc.ConnectionImpl@cb2caaf (No operations allowed after connection closed.). Possibly consider using a shorter maxLifetime value.
-2026-09-05T07:57:12.019+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=54s973ms382µs900ns).
-2026-09-05T08:21:27.884+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=8m45s623ms9µs).
-2026-09-05T08:44:28.640+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=21m30s740ms567µs700ns).
-2026-09-05T08:53:45.625+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=6m7s168ms961µs600ns).
-2026-09-05T09:03:52.467+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=7m6s801ms129µs700ns).
-2026-09-05T09:53:10.111+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=30m47s327ms296µs100ns).
-2026-09-05T10:25:30.702+05:30  WARN 9156 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=32m20s590ms182µs400ns).
-2026-09-05T11:42:13.160+05:30  INFO 9156 --- [http-nio-8081-exec-10] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 3516 ms
-2026-09-05T13:07:09.921+05:30  INFO 9156 --- [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
-2026-09-05T13:07:09.952+05:30  INFO 9156 --- [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
-2026-09-05T13:07:09.985+05:30  INFO 9156 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
-2026-09-05T13:07:10.025+05:30  INFO 9156 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
-2026-09-05T13:07:10.032+05:30  INFO 9156 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
-2026-09-05T13:07:33.457+05:30  INFO 8316 --- [main] com.testpulse.TestPluseApplication       : Starting TestPluseApplication using Java 25 with PID 8316 (E:\TestPluse\target\classes started by Praveen in E:\TestPluse)
-2026-09-05T13:07:33.460+05:30  INFO 8316 --- [main] com.testpulse.TestPluseApplication       : The following 1 profile is active: "dev"
-2026-09-05T13:07:34.899+05:30  INFO 8316 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
-2026-09-05T13:07:34.989+05:30  INFO 8316 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 80 ms. Found 14 JPA repository interfaces.
-2026-09-05T13:07:35.636+05:30  INFO 8316 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
-2026-09-05T13:07:35.650+05:30  INFO 8316 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
-2026-09-05T13:07:35.650+05:30  INFO 8316 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.14]
-2026-09-05T13:07:35.727+05:30  INFO 8316 --- [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2193 ms
-2026-09-05T13:07:35.937+05:30  INFO 8316 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
-2026-09-05T13:07:36.016+05:30  INFO 8316 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 7.1.8.Final
-2026-09-05T13:07:36.525+05:30  INFO 8316 --- [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
-2026-09-05T13:07:36.565+05:30  INFO 8316 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
-2026-09-05T13:07:36.715+05:30  INFO 8316 --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@71098fb3
-2026-09-05T13:07:36.717+05:30  INFO 8316 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
-2026-09-05T13:07:36.767+05:30  WARN 8316 --- [main] org.hibernate.dialect.Dialect            : HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
-2026-09-05T13:07:36.772+05:30  WARN 8316 --- [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-09-05T13:07:36.796+05:30  INFO 8316 --- [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+2026-09-06T15:59:28.329+05:30  INFO 25436 --- [main] com.testpulse.TestPluseApplication       : Starting TestPluseApplication using Java 25 with PID 25436 (E:\TestPluse\target\classes started by Praveen in E:\TestPluse)
+2026-09-06T15:59:28.345+05:30  INFO 25436 --- [main] com.testpulse.TestPluseApplication       : The following 1 profile is active: "dev"
+2026-09-06T15:59:33.830+05:30  INFO 25436 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-09-06T15:59:34.063+05:30  INFO 25436 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 210 ms. Found 14 JPA repository interfaces.
+2026-09-06T15:59:35.640+05:30  INFO 25436 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8081 (http)
+2026-09-06T15:59:35.676+05:30  INFO 25436 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-09-06T15:59:35.676+05:30  INFO 25436 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.14]
+2026-09-06T15:59:35.843+05:30  INFO 25436 --- [main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 7379 ms
+2026-09-06T15:59:36.508+05:30  INFO 25436 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-09-06T15:59:36.638+05:30  INFO 25436 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 7.1.8.Final
+2026-09-06T15:59:37.705+05:30  INFO 25436 --- [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-09-06T15:59:37.780+05:30  INFO 25436 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-09-06T15:59:38.149+05:30  INFO 25436 --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@4629dde5
+2026-09-06T15:59:38.151+05:30  INFO 25436 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-09-06T15:59:38.240+05:30  WARN 25436 --- [main] org.hibernate.dialect.Dialect            : HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2026-09-06T15:59:38.248+05:30  WARN 25436 --- [main] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-09-06T15:59:38.288+05:30  INFO 25436 --- [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
 	Database JDBC URL [jdbc:mysql://127.0.0.1:3307/testplusnew?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC]
 	Database driver: MySQL Connector/J
 	Database dialect: MySQLDialect
@@ -50,24 +26,27 @@
 	Pool: DatasourceConnectionProviderImpl
 	Minimum pool size: undefined/unknown
 	Maximum pool size: undefined/unknown
-2026-09-05T13:07:38.038+05:30  INFO 8316 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
-2026-09-05T13:07:38.275+05:30  INFO 8316 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
-2026-09-05T13:07:38.390+05:30  INFO 8316 --- [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
-2026-09-05T13:07:40.081+05:30  WARN 8316 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-09-05T13:07:40.144+05:30  WARN 8316 --- [main] .s.a.UserDetailsServiceAutoConfiguration : 
+2026-09-06T15:59:41.082+05:30  INFO 25436 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-09-06T15:59:41.561+05:30  INFO 25436 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-09-06T15:59:41.815+05:30  INFO 25436 --- [main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-09-06T15:59:44.806+05:30  WARN 25436 --- [main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-09-06T15:59:44.939+05:30  WARN 25436 --- [main] .s.a.UserDetailsServiceAutoConfiguration : 
 
-Using generated security password: 4665ddb3-ec1d-484f-84e6-11908365a4b1
+Using generated security password: 852cd0d3-4916-423c-8d3c-a2fce8712c43
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2026-09-05T13:07:40.152+05:30  INFO 8316 --- [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2026-09-05T13:07:40.799+05:30  INFO 8316 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
-2026-09-05T13:07:40.807+05:30  INFO 8316 --- [main] com.testpulse.TestPluseApplication       : Started TestPluseApplication in 8.015 seconds (process running for 8.67)
-2026-09-05T13:07:48.577+05:30  INFO 8316 --- [http-nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
-2026-09-05T13:07:48.578+05:30  INFO 8316 --- [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
-2026-09-05T13:07:48.579+05:30  INFO 8316 --- [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
-2026-09-05T13:07:50.134+05:30  INFO 8316 --- [http-nio-8081-exec-9] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 1068 ms
-2026-09-05T13:09:40.573+05:30  INFO 8316 --- [task-1] c.testpulse.service.WelcomeEmailService  : Sending welcome email to praveenkumar.niit001@gmail.com
-2026-09-05T13:09:49.170+05:30  INFO 8316 --- [task-1] c.testpulse.service.WelcomeEmailService  : Welcome email sent successfully to praveenkumar.niit001@gmail.com
-2026-09-05T13:40:47.149+05:30  WARN 8316 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m43s987ms202µs).
-2026-09-05T14:58:22.002+05:30  WARN 8316 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=27m34s87ms796µs700ns).
+2026-09-06T15:59:44.951+05:30  INFO 25436 --- [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2026-09-06T15:59:46.272+05:30  INFO 25436 --- [main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoints beneath base path '/actuator'
+2026-09-06T15:59:46.403+05:30  INFO 25436 --- [main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8081 (http) with context path '/'
+2026-09-06T15:59:46.426+05:30  INFO 25436 --- [main] com.testpulse.TestPluseApplication       : Started TestPluseApplication in 19.409 seconds (process running for 20.515)
+2026-09-06T16:00:02.465+05:30  INFO 25436 --- [http-nio-8081-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-09-06T16:00:02.466+05:30  INFO 25436 --- [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-09-06T16:00:02.469+05:30  INFO 25436 --- [http-nio-8081-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 3 ms
+2026-09-06T16:00:13.084+05:30  INFO 25436 --- [http-nio-8081-exec-10] o.springdoc.api.AbstractOpenApiResource  : Init duration for springdoc-openapi is: 1407 ms
+2026-09-06T16:41:25.330+05:30  WARN 25436 --- [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=50s584ms89µs800ns).
+2026-09-06T18:56:54.977+05:30  INFO 25436 --- [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown         : Commencing graceful shutdown. Waiting for active requests to complete
+2026-09-06T18:56:55.002+05:30  INFO 25436 --- [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown         : Graceful shutdown complete
+2026-09-06T18:56:55.050+05:30  INFO 25436 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-09-06T18:56:55.089+05:30  INFO 25436 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-09-06T18:56:55.097+05:30  INFO 25436 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
