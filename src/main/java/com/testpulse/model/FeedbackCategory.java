@@ -5,5 +5,6 @@ public enum FeedbackCategory {
     FEATURE_REQUEST,
     QUESTION_ERROR,
     BILLING,
+    QUESTION_ISSUE,
     APP_EXPERIENCE
 }

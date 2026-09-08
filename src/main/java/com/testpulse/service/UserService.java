@@ -21,9 +21,23 @@ public interface UserService {
 
     Optional<User> findByMobileNumber(String mobileNumber);
 
+
+
+
+
+
+
+
+
+
+          
+
+         
     Optional<User> findById(Long id);
 
     User updatePreferredLanguage(Long userId, String language);
+
+    User updateMobileNumber(Long userId, String mobileNumber);
 
     User updateProfile(Long userId, String fullName, String email, String mobileNumber, String preferredLanguage);
 
@@ -31,5 +45,5 @@ public interface UserService {
 
     void changePassword(Long userId, String currentPassword, String newPassword);
 
-    Optional<User> login(String mobileNumber, String password);
+    Optional<User> login(String identifier, String password);
 }

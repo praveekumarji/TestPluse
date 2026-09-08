@@ -1,10 +1,13 @@
 package com.testpulse.controller;
 
+import com.testpulse.dto.UpdateMobileNumberRequest;
 import com.testpulse.dto.UpdateUserProfileRequest;
 import com.testpulse.dto.UserResponse;
 import com.testpulse.model.SubscriptionStatus;
 import com.testpulse.model.User;
 import com.testpulse.service.UserService;
+import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,6 +53,22 @@ public class UserController {
                                                               @RequestParam String language) {
         User user = userService.updatePreferredLanguage(id, language);
         return ResponseEntity.ok(toUserResponse(user));
+    }
+
+    @PatchMapping("/mobile-number")
+    public ResponseEntity<?> updateMobileNumber(
+            Authentication authentication,
+            @Valid @RequestBody UpdateMobileNumberRequest request) {
+        try {
+            Long userId = Long.valueOf(authentication.getName());
+            User user = userService.updateMobileNumber(userId, request.getMobileNumber());
+            return ResponseEntity.ok(toUserResponse(user));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of(
+                    "error", "MOBILE_NUMBER_ALREADY_REGISTERED",
+                    "message", "This mobile number is already registered to another user."
+            ));
+        }
     }
 
     @PutMapping("/{id}/profile")

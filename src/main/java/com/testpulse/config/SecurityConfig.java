@@ -28,11 +28,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/auth/change-password").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/tests/**",
                                 "/api/payment/**",
                                 "/api/config",
+                                "/api/feedback",
                                 "/error",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
