@@ -71,6 +71,7 @@ public class AdminController {
                     .mode(request.getMode() == null ? null : com.testpulse.model.Modes.valueOf(request.getMode().trim().toUpperCase()))
                     .difficulty(request.getDifficulty() == null ? null : com.testpulse.model.difficulty.valueOf(request.getDifficulty().trim().toUpperCase()))
                     .testType(request.getTestType() == null ? null : com.testpulse.model.TestType.valueOf(request.getTestType().trim().toUpperCase()))
+                    .educationClass(request.getClassId() == null ? null : com.testpulse.model.EducationClass.builder().id(request.getClassId()).build())
                     .active(request.getActive() == null ? true : request.getActive())
                     .build();
             return ResponseEntity.ok(testService.updateTest(id, test));

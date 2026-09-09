@@ -46,9 +46,10 @@ public class AuthController {
             @RequestParam String password,
             @RequestParam String fullName,
             @RequestParam(defaultValue = "en") String preferredLanguage,
-            @RequestParam(required = false) String deviceHash) {
+            @RequestParam(required = false) String deviceHash,
+            @RequestParam(required = false) Long classId) {
         try {
-            User user = userService.registerUser(email, mobileNumber, password, fullName, preferredLanguage, deviceHash);
+            User user = userService.registerUser(email, mobileNumber, password, fullName, preferredLanguage, deviceHash, classId);
             if (user.getEmail() != null && !user.getEmail().isBlank()) {
                 welcomeEmailService.sendWelcomeEmailAsync(user, password);
             }
@@ -93,16 +94,17 @@ public class AuthController {
                     request.getPassword(),
                     request.getFullName(),
                         request.getPreferredLanguage() == null ? "en" : request.getPreferredLanguage(),
-                        request.getDeviceHash()
+                        request.getDeviceHash(),
+                        request.getClassId()
             );
 
             if (user.getEmail() != null && !user.getEmail().isBlank()) {
                 welcomeEmailService.sendWelcomeEmailAsync(user, request.getPassword());
             }
 
-                    if ("PAID".equalsIgnoreCase(subscriptionStatus)) {
-                    user.setSubscriptionStatus(SubscriptionStatus.PAID);
-                    }
+            if ("PAID".equalsIgnoreCase(subscriptionStatus)) {
+                user = userService.updateSubscriptionStatus(user.getId(), SubscriptionStatus.PAID);
+            }
             String token = JwtUtil.generateToken(user.getId(), user.getMobileNumber(), user.getRole().name());
             return ResponseEntity.ok(AuthResponse.builder()
                     .success(true)
@@ -208,8 +210,10 @@ public class AuthController {
                 .email(user.getEmail())
                 .mobileNumber(user.getMobileNumber())
                 .fullName(user.getFullName())
+                .classId(user.getEducationClass() == null ? null : user.getEducationClass().getId())
+                .className(user.getEducationClass() == null ? null : user.getEducationClass().getName())
                 .preferredLanguage(user.getPreferredLanguage())
-                .subscriptionStatus(user.getSubscriptionStatus())
+                .subscriptionStatus(user.getEffectiveSubscriptionStatus())
                 .subscriptionPlan(user.getSubscriptionPlan())
                 .subscriptionExpiry(user.getSubscriptionExpiry())
                 .hasUsedTrial(user.isHasUsedTrial())

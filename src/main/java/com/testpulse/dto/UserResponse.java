@@ -20,6 +20,8 @@ public class UserResponse {
     private String authProvider;
     private String role;
     private String targetExam;
+    private Long classId;
+    private String className;
     private java.time.LocalDateTime createdAt;
     private String preferredLanguage;
     private SubscriptionStatus subscriptionStatus;

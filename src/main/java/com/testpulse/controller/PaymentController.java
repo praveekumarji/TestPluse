@@ -34,6 +34,7 @@ public class PaymentController {
 
             Payment payment = paymentService.initiatePayment(
                     request.getUserId(),
+                    request.getPlanId(),
                     request.getPlanName(),
                     request.getAmount()
             );

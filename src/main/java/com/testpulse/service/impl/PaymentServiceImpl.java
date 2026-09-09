@@ -7,9 +7,11 @@ import com.testpulse.model.User;
 import com.testpulse.dto.PaymentRecordRequest;
 import com.testpulse.dto.PaymentRecordResponse;
 import com.testpulse.repository.PaymentRepository;
+import com.testpulse.repository.SubscriptionPlanRepository;
 import com.testpulse.repository.UserRepository;
 import com.testpulse.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,17 +30,31 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
+    private final SubscriptionPlanRepository subscriptionPlanRepository;
     @Value("${razorpay.key-secret:}")
     private String razorpayKeySecret;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, UserRepository userRepository) {
+    @Autowired
+    public PaymentServiceImpl(PaymentRepository paymentRepository, UserRepository userRepository,
+                              SubscriptionPlanRepository subscriptionPlanRepository) {
         this.paymentRepository = paymentRepository;
         this.userRepository = userRepository;
+        this.subscriptionPlanRepository = subscriptionPlanRepository;
+    }
+
+    public PaymentServiceImpl(PaymentRepository paymentRepository, UserRepository userRepository) {
+        this(paymentRepository, userRepository, null);
     }
 
     @Override
     @Transactional
     public Payment initiatePayment(Long userId, String planName, BigDecimal amount) {
+        return initiatePayment(userId, null, planName, amount);
+    }
+
+    @Override
+    @Transactional
+    public Payment initiatePayment(Long userId, String planId, String planName, BigDecimal amount) {
         if (userId == null) {
             throw new IllegalArgumentException("User ID is required.");
         }
@@ -51,9 +67,11 @@ public class PaymentServiceImpl implements PaymentService {
 
         User user = userRepository == null ? null : userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        validatePlanForUser(user, planId);
 
         Payment payment = Payment.builder()
                 .user(user)
+            .planId(planId)
                 .planName(planName)
                 .amount(amount)
                 .status(PaymentStatus.PENDING)
@@ -126,6 +144,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found."));
+        validatePlanForUser(user, request.getPlanId());
         log.info("Storing payment record for userId: {}, planId: {}, amountInPaise: {}, status: {}",
                 user.getId(), request.getPlanId(), request.getAmountInPaise(), storedStatus);
         Payment payment = Payment.builder()
@@ -155,6 +174,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (storedStatus == PaymentStatus.SUCCESS) {
             log.info("Updating user subscription for userId: {}", user.getId());
             user.setSubscriptionStatus(SubscriptionStatus.PAID);
+            user.setSubscriptionClassId(user.getEducationClass() == null ? null : user.getEducationClass().getId());
             log.info("seting user subscription status to PAID for userId: {}", user.getId());
             user.setSubscriptionPlan(request.getPlanCode() == null ? request.getPlanId() : request.getPlanCode());
             user.setSubscriptionExpiry(LocalDateTime.now().plusDays(request.getDurationDays()));
@@ -168,10 +188,27 @@ public class PaymentServiceImpl implements PaymentService {
                 .paymentStatus(requestedStatus)
                 .user(PaymentRecordResponse.UserSubscriptionResponse.builder()
                         .id(user.getId())
-                        .subscriptionStatus(user.getSubscriptionStatus().name())
+                        .subscriptionStatus(user.getEffectiveSubscriptionStatus().name())
                         .subscriptionPlan(user.getSubscriptionPlan())
                         .build())
                 .build();
+    }
+
+    private void validatePlanForUser(User user, String planId) {
+        if (planId == null || planId.isBlank() || subscriptionPlanRepository == null) {
+            return;
+        }
+
+        com.testpulse.model.SubscriptionPlan plan = subscriptionPlanRepository.findById(planId)
+                .orElseThrow(() -> new IllegalArgumentException("Subscription plan not found."));
+        if (user == null || user.getEducationClass() == null) {
+            return;
+        }
+        boolean supported = plan.getEducationClasses().stream()
+                .anyMatch(educationClass -> educationClass.getId().equals(user.getEducationClass().getId()));
+        if (!supported) {
+            throw new IllegalArgumentException("This subscription plan is not available for the user's class.");
+        }
     }
 
     private void verifyRazorpaySignature(PaymentRecordRequest request) {

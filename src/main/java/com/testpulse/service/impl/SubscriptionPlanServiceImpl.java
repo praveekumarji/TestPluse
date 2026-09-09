@@ -25,6 +25,15 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
     }
 
     @Override
+    @Cacheable(value = "subscriptionPlans", key = "'class:' + #classId")
+    public List<SubscriptionPlan> getAllPlans(Long classId) {
+        if (classId == null) {
+            return getAllPlans();
+        }
+        return subscriptionPlanRepository.findDistinctByEducationClasses_Id(classId);
+    }
+
+    @Override
     @CacheEvict(value = "subscriptionPlans", allEntries = true)
     public SubscriptionPlan createPlan(SubscriptionPlan plan) {
         validatePlan(plan);
@@ -59,6 +68,7 @@ public class SubscriptionPlanServiceImpl implements SubscriptionPlanService {
         existing.setBadge(plan.getBadge());
         existing.setRecommended(plan.isRecommended());
         existing.setFeatures(plan.getFeatures());
+        existing.setEducationClasses(plan.getEducationClasses());
 
         return subscriptionPlanRepository.save(existing);
     }

@@ -5,6 +5,8 @@ import com.testpulse.model.User;
 import com.testpulse.repository.UserRepository;
 import com.testpulse.repository.TrialDeviceRepository;
 import com.testpulse.model.TrialDevice;
+import com.testpulse.model.EducationClass;
+import com.testpulse.repository.EducationClassRepository;
 import com.testpulse.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,20 +27,23 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final TrialDeviceRepository trialDeviceRepository;
+    private final EducationClassRepository educationClassRepository;
     private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
     private final int trialDurationDays;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository,
                            TrialDeviceRepository trialDeviceRepository,
+                           EducationClassRepository educationClassRepository,
                            @Value("${subscription.trial-days:3}") int trialDurationDays) {
         this.userRepository = userRepository;
         this.trialDeviceRepository = trialDeviceRepository;
+        this.educationClassRepository = educationClassRepository;
         this.trialDurationDays = trialDurationDays;
     }
 
     public UserServiceImpl(UserRepository userRepository) {
-        this(userRepository, null, 3);
+        this(userRepository, null, null, 3);
     }
 
     @Override
@@ -54,6 +59,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User registerUser(String email, String mobileNumber, String password, String fullName,
                              String preferredLanguage, String deviceHash) {
+        return registerUser(email, mobileNumber, password, fullName, preferredLanguage, deviceHash, null);
+    }
+
+    @Override
+    public User registerUser(String email, String mobileNumber, String password, String fullName,
+                             String preferredLanguage, String deviceHash, Long classId) {
         String normalizedMobile = normalizeMobileNumber(mobileNumber);
 
         if (normalizedMobile == null || normalizedMobile.isBlank()) {
@@ -75,6 +86,7 @@ public class UserServiceImpl implements UserService {
                 .mobileNumber(normalizedMobile)
                 .passwordHash(passwordEncoder.encode(password))
                 .fullName(fullName)
+                .educationClass(findActiveClass(classId))
                 .createdAt(LocalDateTime.now())
                 .preferredLanguage(normalizeLanguage(preferredLanguage))
                 .subscriptionStatus(trialAvailable ? SubscriptionStatus.TRIAL : SubscriptionStatus.FREE)
@@ -157,6 +169,13 @@ public class UserServiceImpl implements UserService {
     @Override
     @CacheEvict(value = "users", allEntries = true)
     public User updateProfile(Long userId, String fullName, String email, String mobileNumber, String preferredLanguage) {
+        return updateProfile(userId, fullName, email, mobileNumber, preferredLanguage, null);
+    }
+
+    @Override
+    @CacheEvict(value = "users", allEntries = true)
+    public User updateProfile(Long userId, String fullName, String email, String mobileNumber,
+                              String preferredLanguage, Long classId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -179,8 +198,32 @@ public class UserServiceImpl implements UserService {
         if (preferredLanguage != null && !preferredLanguage.isBlank()) {
             user.setPreferredLanguage(normalizeLanguage(preferredLanguage));
         }
+        if (classId != null) {
+            user.setEducationClass(findActiveClass(classId));
+        }
 
         return userRepository.save(user);
+    }
+
+    @Override
+    @CacheEvict(value = "users", allEntries = true)
+    public User updateClass(Long userId, Long classId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setEducationClass(findActiveClass(classId));
+        return userRepository.save(user);
+    }
+
+    private EducationClass findActiveClass(Long classId) {
+        if (classId == null) {
+            return null;
+        }
+        if (educationClassRepository == null) {
+            throw new IllegalStateException("Class repository is not configured.");
+        }
+        return educationClassRepository.findById(classId)
+                .filter(EducationClass::isActive)
+                .orElseThrow(() -> new IllegalArgumentException("Class not found."));
     }
 
 
@@ -197,6 +240,11 @@ public class UserServiceImpl implements UserService {
             user.setHasUsedTrial(true);
             user.setSubscriptionPlan(TRIAL_PLAN);
             user.setSubscriptionExpiry(LocalDateTime.now().plusDays(trialDurationDays));
+        }
+        if (status == SubscriptionStatus.PAID || status == SubscriptionStatus.PRIME) {
+            user.setSubscriptionClassId(user.getEducationClass() == null ? null : user.getEducationClass().getId());
+        } else if (status == SubscriptionStatus.FREE || status == SubscriptionStatus.EXPIRED) {
+            user.setSubscriptionClassId(null);
         }
         user.setSubscriptionStatus(status == null ? SubscriptionStatus.FREE : status);
         log.info("Updated subscription status for userId: {}, new status: {}", userId, user.getSubscriptionStatus());

@@ -34,6 +34,8 @@ public class CreateTestRequest {
     @NotBlank
     private String difficulty;
 
+    private Long classId;
+
     @Builder.Default
     private String testType = "FREE";
 }

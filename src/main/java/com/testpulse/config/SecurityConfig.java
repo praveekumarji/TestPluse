@@ -29,6 +29,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/auth/change-password").authenticated()
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/classes", "/api/classes/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/classes").hasRole("ADMIN")
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/tests/**",

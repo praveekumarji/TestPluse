@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 public interface PaymentService {
     Payment initiatePayment(Long userId, String planName, BigDecimal amount);
 
+    Payment initiatePayment(Long userId, String planId, String planName, BigDecimal amount);
+
     Payment getPaymentById(Long paymentId);
 
     Payment recordSuccess(Long paymentId, String razorpayPaymentId);

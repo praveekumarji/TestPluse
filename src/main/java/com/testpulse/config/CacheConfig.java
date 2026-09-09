@@ -46,9 +46,11 @@ public class CacheConfig {
                 "tests",
                 "questions",
                 "subscriptionPlans",
+                "educationClasses",
                 "coupons",
                 "bookmarks",
-                "appConfig"
+                "appConfig",
+                "testAttempts"
         );
     }
 }

@@ -18,4 +18,6 @@ public class TestResponse {
     private String mode;
     private String difficulty;
     private String testType;
+    private Long classId;
+    private String className;
 }

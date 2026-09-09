@@ -2,7 +2,9 @@ package com.testpulse.controller;
 
 import com.testpulse.dto.UpdateMobileNumberRequest;
 import com.testpulse.dto.UpdateUserProfileRequest;
+import com.testpulse.dto.UpdateUserClassRequest;
 import com.testpulse.dto.UserResponse;
+import com.testpulse.dto.UserSubscriptionResponse;
 import com.testpulse.model.SubscriptionStatus;
 import com.testpulse.model.User;
 import com.testpulse.service.UserService;
@@ -29,6 +31,57 @@ public class UserController {
                 .map(this::toUserResponse)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/me/subscription")
+    public ResponseEntity<?> getMySubscription(Authentication authentication) {
+        try {
+            Long userId = Long.valueOf(authentication.getName());
+            return userService.findById(userId)
+                    .map(user -> ResponseEntity.ok(UserSubscriptionResponse.builder()
+                            .userId(user.getId())
+                            .status(user.getEffectiveSubscriptionStatus())
+                            .planCode(user.getSubscriptionPlan())
+                            .expiry(user.getSubscriptionExpiry())
+                            .classId(user.getEducationClass() == null ? null : user.getEducationClass().getId())
+                            .className(user.getEducationClass() == null ? null : user.getEducationClass().getName())
+                            .hasUsedTrial(user.isHasUsedTrial())
+                            .build()))
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (NumberFormatException | NullPointerException ex) {
+            return ResponseEntity.status(401).body(Map.of("error", "Authentication required."));
+        }
+    }
+
+    @PatchMapping("/me/class")
+    public ResponseEntity<?> updateMyClass(Authentication authentication,
+                                            @Valid @RequestBody UpdateUserClassRequest request) {
+        try {
+            Long userId = Long.valueOf(authentication.getName());
+            User user = userService.updateClass(userId, request.getClassId());
+            return ResponseEntity.ok(toUserResponse(user));
+        } catch (NumberFormatException | NullPointerException ex) {
+            return ResponseEntity.status(401).body(Map.of("error", "Authentication required."));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
+    }
+
+    @PatchMapping("/{id}/class")
+    public ResponseEntity<?> updateUserClass(@PathVariable Long id,
+                                              Authentication authentication,
+                                              @Valid @RequestBody UpdateUserClassRequest request) {
+        boolean isAdmin = authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+        try {
+            if (authentication == null || (!isAdmin && !String.valueOf(id).equals(authentication.getName()))) {
+                return ResponseEntity.status(403).body(Map.of("error", "You cannot update this user's class."));
+            }
+            User user = userService.updateClass(id, request.getClassId());
+            return ResponseEntity.ok(toUserResponse(user));
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+        }
     }
 
     @GetMapping("/by-email")
@@ -80,7 +133,8 @@ public class UserController {
                     request.getFullName(),
                     request.getEmail(),
                     request.getMobileNumber(),
-                    request.getPreferredLanguage()
+                    request.getPreferredLanguage(),
+                    request.getClassId()
             );
             return ResponseEntity.ok(toUserResponse(user));
         } catch (IllegalArgumentException ex) {
@@ -110,8 +164,10 @@ public class UserController {
                 .email(user.getEmail())
                 .mobileNumber(user.getMobileNumber())
                 .fullName(user.getFullName())
+                .classId(user.getEducationClass() == null ? null : user.getEducationClass().getId())
+                .className(user.getEducationClass() == null ? null : user.getEducationClass().getName())
                 .preferredLanguage(user.getPreferredLanguage())
-                .subscriptionStatus(user.getSubscriptionStatus())
+                .subscriptionStatus(user.getEffectiveSubscriptionStatus())
                 .subscriptionPlan(user.getSubscriptionPlan())
                 .subscriptionExpiry(user.getSubscriptionExpiry())
                 .hasUsedTrial(user.isHasUsedTrial())

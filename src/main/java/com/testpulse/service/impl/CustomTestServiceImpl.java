@@ -41,6 +41,14 @@ public class CustomTestServiceImpl implements CustomTestService {
     @Transactional(readOnly = true)
     public CustomTestPreviewResponse generateCustomTest(String subject, int questionCount,
                                                          String difficultyLevel, String modeName, String lang) {
+        return generateCustomTest(subject, questionCount, difficultyLevel, modeName, lang, null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public CustomTestPreviewResponse generateCustomTest(String subject, int questionCount,
+                                                         String difficultyLevel, String modeName, String lang,
+                                                         Long classId) {
         if (subject == null || subject.isBlank()) {
             throw new IllegalArgumentException("Subject is required.");
         }
@@ -54,8 +62,11 @@ public class CustomTestServiceImpl implements CustomTestService {
                 ? "PRACTICE" : modeName.trim().toUpperCase(Locale.ROOT);
         com.testpulse.model.difficulty difficulty = com.testpulse.model.difficulty.valueOf(normalizedDifficulty);
         com.testpulse.model.Modes mode = com.testpulse.model.Modes.valueOf(normalizedMode);
+        if (classId == null) {
+            throw new IllegalArgumentException("Class ID is required.");
+        }
 
-        List<Question> questions = questionRepository.findActiveForCustomTest(subject.trim(), mode, difficulty);
+        List<Question> questions = questionRepository.findActiveForCustomTest(subject.trim(), classId, mode, difficulty);
         Collections.shuffle(questions);
         if (questions.size() < questionCount) {
             throw new IllegalArgumentException("Only " + questions.size()
@@ -100,9 +111,9 @@ public class CustomTestServiceImpl implements CustomTestService {
     @Transactional
     public CustomTestResponse createCustomTest(CreateCustomTestRequest request, String lang) {
         Long userId = getCurrentUserId().orElseThrow(() -> new IllegalStateException("Authentication required."));
-        if (customTestRepository.countByOwnerUserIdAndActiveTrue(userId) >= MAX_CUSTOM_TESTS_PER_USER) {
+       /* if (customTestRepository.countByOwnerUserIdAndActiveTrue(userId) >= MAX_CUSTOM_TESTS_PER_USER) {
             throw new IllegalArgumentException("You can only create up to " + MAX_CUSTOM_TESTS_PER_USER + " custom tests.");
-        }
+        }*/
 
         if (request.getQuestionIds() == null || request.getQuestionIds().isEmpty()) {
             throw new IllegalArgumentException("At least one question ID is required.");

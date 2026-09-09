@@ -13,6 +13,9 @@ public interface UserService {
     User registerUser(String email, String mobileNumber, String password, String fullName,
                       String preferredLanguage, String deviceHash);
 
+    User registerUser(String email, String mobileNumber, String password, String fullName,
+                      String preferredLanguage, String deviceHash, Long classId);
+
     User registerUser(String email, String password, String fullName, String preferredLanguage);
 
     Optional<User> findByEmail(String email);
@@ -40,6 +43,11 @@ public interface UserService {
     User updateMobileNumber(Long userId, String mobileNumber);
 
     User updateProfile(Long userId, String fullName, String email, String mobileNumber, String preferredLanguage);
+
+    User updateProfile(Long userId, String fullName, String email, String mobileNumber,
+                       String preferredLanguage, Long classId);
+
+    User updateClass(Long userId, Long classId);
 
     User updateSubscriptionStatus(Long userId, SubscriptionStatus status);
 

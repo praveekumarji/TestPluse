@@ -13,6 +13,7 @@ import java.math.BigDecimal;
 @Builder
 public class PaymentInitiateRequest {
     private Long userId;
+    private String planId;
     private String planName;
     private BigDecimal amount;
 }

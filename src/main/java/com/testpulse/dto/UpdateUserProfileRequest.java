@@ -14,4 +14,5 @@ public class UpdateUserProfileRequest {
     private String email;
     private String mobileNumber;
     private String preferredLanguage;
+    private Long classId;
 }

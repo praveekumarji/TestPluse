@@ -41,5 +41,7 @@ public class UpdateTestRequest {
     @Size(min = 1)
     private String testType;
 
+    private Long classId;
+
     private Boolean active;
 }

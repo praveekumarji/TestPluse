@@ -42,6 +42,10 @@ public class User {
     @Column(name = "target_exam")
     private String targetExam;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "class_id")
+    private EducationClass educationClass;
+
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -56,6 +60,9 @@ public class User {
     @Column(name = "subscription_plan")
     private String subscriptionPlan;
 
+    @Column(name = "subscription_class_id")
+    private Long subscriptionClassId;
+
     @Column(name = "subscription_expiry")
     private LocalDateTime subscriptionExpiry;
 
@@ -68,6 +75,18 @@ public class User {
 
     @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
+
+    @Transient
+    public SubscriptionStatus getEffectiveSubscriptionStatus() {
+        if ((subscriptionStatus == SubscriptionStatus.TRIAL
+                || subscriptionStatus == SubscriptionStatus.PAID
+                || subscriptionStatus == SubscriptionStatus.PRIME)
+                && subscriptionClassId != null
+                && (educationClass == null || !subscriptionClassId.equals(educationClass.getId()))) {
+            return SubscriptionStatus.FREE;
+        }
+        return subscriptionStatus == null ? SubscriptionStatus.FREE : subscriptionStatus;
+    }
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

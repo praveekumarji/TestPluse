@@ -51,6 +51,10 @@ public class Test {
     @Column
     private Long ownerUserId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "class_id")
+    private EducationClass educationClass;
+
     @Column(nullable = false)
     @Builder.Default
     private boolean active = true;

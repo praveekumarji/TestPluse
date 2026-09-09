@@ -7,7 +7,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "subscription_plans")
@@ -54,6 +56,15 @@ public class SubscriptionPlan {
     @Column(name = "is_recommended")
     @JsonProperty("isRecommended")
     private boolean isRecommended;
+
+        @ManyToMany
+        @JoinTable(
+            name = "subscription_plan_classes",
+            joinColumns = @JoinColumn(name = "plan_id"),
+            inverseJoinColumns = @JoinColumn(name = "class_id")
+        )
+        @Builder.Default
+        private Set<EducationClass> educationClasses = new LinkedHashSet<>();
 
     @ElementCollection
     @CollectionTable(name = "subscription_plan_features", joinColumns = @JoinColumn(name = "plan_id"))

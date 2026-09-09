@@ -11,6 +11,10 @@ public interface CustomTestService {
     CustomTestPreviewResponse generateCustomTest(String subject, int questionCount,
                                                  String difficulty, String mode, String lang);
 
+    CustomTestPreviewResponse generateCustomTest(String subject, int questionCount,
+                                                 String difficulty, String mode, String lang,
+                                                 Long classId);
+
     List<CustomTestResponse> getMyCustomTests(String lang);
 
     CustomTestResponse getCustomTestById(Long id, String lang);

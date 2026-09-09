@@ -236,7 +236,7 @@ public class GoogleAuthService {
                 .mobileNumber(user.getMobileNumber())
                 .fullName(user.getFullName())
                 .preferredLanguage(user.getPreferredLanguage())
-                .subscriptionStatus(user.getSubscriptionStatus())
+                .subscriptionStatus(user.getEffectiveSubscriptionStatus())
                 .subscriptionPlan(user.getSubscriptionPlan())
                 .subscriptionExpiry(user.getSubscriptionExpiry())
                 .hasUsedTrial(user.isHasUsedTrial())

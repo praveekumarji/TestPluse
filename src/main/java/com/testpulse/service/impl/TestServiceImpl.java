@@ -1,11 +1,13 @@
 package com.testpulse.service.impl;
 
 import com.testpulse.dto.CreateTestRequest;
+import com.testpulse.model.EducationClass;
 import com.testpulse.model.Modes;
 import com.testpulse.model.Test;
 import com.testpulse.model.TestType;
 import com.testpulse.model.difficulty;
 import com.testpulse.repository.TestRepository;
+import com.testpulse.repository.EducationClassRepository;
 import com.testpulse.service.TestService;
 import com.testpulse.util.LocalizedTextResolver;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,17 +22,23 @@ import java.util.Locale;
 public class TestServiceImpl implements TestService {
 
     private final TestRepository testRepository;
+    private final EducationClassRepository educationClassRepository;
 
-    public TestServiceImpl(TestRepository testRepository) {
+    public TestServiceImpl(TestRepository testRepository, EducationClassRepository educationClassRepository) {
         this.testRepository = testRepository;
+        this.educationClassRepository = educationClassRepository;
     }
 
     @Override
     @Cacheable(value = "tests", key = "'all:' + #subject + ':' + #searchQuery + ':' + #lang")
     public List<Test> getAllTests(String searchQuery, String subject, String lang) {
-        List<Test> tests = (subject != null && !subject.isBlank())
-                ? testRepository.findBySubjectContainingIgnoreCase(subject)
-                : testRepository.findAll();
+        return getAllTests(searchQuery, subject, null, lang);
+    }
+
+    @Override
+    @Cacheable(value = "tests", key = "'all:' + #subject + ':' + #searchQuery + ':' + #classId + ':' + #lang")
+    public List<Test> getAllTests(String searchQuery, String subject, Long classId, String lang) {
+        List<Test> tests = testRepository.findActiveByClassAndSubject(classId, subject);
 
         if (searchQuery != null && !searchQuery.isBlank()) {
             String query = searchQuery.toLowerCase(Locale.ROOT);
@@ -43,7 +51,6 @@ public class TestServiceImpl implements TestService {
         }
 
         return tests.stream()
-                .filter(Test::isActive)
                 .map(test -> applyLanguage(test, lang))
                 .toList();
     }
@@ -51,9 +58,20 @@ public class TestServiceImpl implements TestService {
     @Override
     @Cacheable(value = "tests", key = "#id + ':' + #lang")
     public Test getTestById(Long id, String lang) {
+        return getTestById(id, null, lang);
+    }
+
+    @Override
+    @Cacheable(value = "tests", key = "#id + ':' + #classId + ':' + #lang")
+    public Test getTestById(Long id, Long classId, String lang) {
         Test test = testRepository.findById(id)
                 .filter(Test::isActive)
                 .orElseThrow(() -> new RuntimeException("Test not found"));
+        if (classId != null
+                && (test.getEducationClass() == null
+                || !classId.equals(test.getEducationClass().getId()))) {
+            throw new RuntimeException("Test not found for the selected class");
+        }
         return applyLanguage(test, lang);
     }
 
@@ -145,6 +163,7 @@ public class TestServiceImpl implements TestService {
                 .mode(Modes.valueOf(request.getMode().trim().toUpperCase(Locale.ROOT)))
                 .difficulty(difficulty.valueOf(request.getDifficulty().trim().toUpperCase(Locale.ROOT)))
                 .testType(TestType.valueOf(normalizedTestType))
+                .educationClass(findActiveClass(request.getClassId()))
                 .build();
     }
 
@@ -230,10 +249,22 @@ public class TestServiceImpl implements TestService {
         if (testUpdate.getTestType() != null) {
             existing.setTestType(testUpdate.getTestType());
         }
+        if (testUpdate.getEducationClass() != null) {
+            existing.setEducationClass(findActiveClass(testUpdate.getEducationClass().getId()));
+        }
         existing.setActive(testUpdate.isActive());
 
         validateTest(existing);
         return applyLanguage(testRepository.save(existing), "en");
+    }
+
+    private EducationClass findActiveClass(Long classId) {
+        if (classId == null) {
+            return null;
+        }
+        return educationClassRepository.findById(classId)
+                .filter(EducationClass::isActive)
+                .orElseThrow(() -> new IllegalArgumentException("Class not found."));
     }
 
     @Override

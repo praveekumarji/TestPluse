@@ -19,8 +19,12 @@ public class SubscriptionPlanController {
     }
 
     @GetMapping("/subscription-plans")
-    public ResponseEntity<List<SubscriptionPlan>> getSubscriptionPlans() {
-        return ResponseEntity.ok(subscriptionPlanService.getAllPlans());
+    public ResponseEntity<List<SubscriptionPlan>> getSubscriptionPlans(
+            @RequestParam(required = false) Long classId) {
+        List<SubscriptionPlan> plans = classId == null
+            ? subscriptionPlanService.getAllPlans()
+            : subscriptionPlanService.getAllPlans(classId);
+        return ResponseEntity.ok(plans);
     }
 
     @PostMapping("/subscription-plans")

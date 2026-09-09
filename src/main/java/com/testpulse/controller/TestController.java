@@ -37,32 +37,43 @@ public class TestController {
     public ResponseEntity<List<TestResponse>> getAllTests(
             @RequestParam(required = false) String searchQuery,
             @RequestParam(required = false) String subject,
+            @RequestParam(required = false) Long classId,
             @RequestParam(defaultValue = "en") String lang) {
-        List<Test> allTests = testService.getAllTests(searchQuery, subject, lang);
+        List<Test> allTests = testService.getAllTests(searchQuery, subject, classId, lang);
         List<TestResponse> response = allTests.stream().map(this::toTestResponse).toList();
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TestResponse> getTestById(@PathVariable Long id,
+                                                   @RequestParam(required = false) Long classId,
                                                    @RequestParam(defaultValue = "en") String lang) {
-        Test test = testService.getTestById(id, lang);
+        Test test = testService.getTestById(id, classId, lang);
         return ResponseEntity.ok(toTestResponse(test));
     }
 
     @PostMapping("/custom")
-        public ResponseEntity<CustomTestPreviewResponse> createCustomTest(@RequestParam String subject,
+        public ResponseEntity<?> createCustomTest(@RequestParam String subject,
                                            @RequestParam(defaultValue = "10") int questionCount,
                                            @RequestParam(defaultValue = "MEDIUM") String difficulty,
                                            @RequestParam(defaultValue = "PRACTICE") String mode,
-                                           @RequestParam(defaultValue = "en") String lang) {
-        return ResponseEntity.ok(customTestService.generateCustomTest(
-            subject, questionCount, difficulty, mode, lang));
+                                           @RequestParam(defaultValue = "en") String lang,
+                                           @RequestParam Long classId) {
+            try {
+                return ResponseEntity.ok(customTestService.generateCustomTest(
+                        subject, questionCount, difficulty, mode, lang, classId));
+            } catch (IllegalStateException ex) {
+                return ResponseEntity.status(401).body(java.util.Map.of("error", ex.getMessage()));
+            } catch (IllegalArgumentException ex) {
+                return ResponseEntity.badRequest().body(java.util.Map.of("error", ex.getMessage()));
+            }
     }
 
     @GetMapping("/{testId}/questions")
     public ResponseEntity<List<QuestionResponse>> getQuestionsByTestId(@PathVariable Long testId,
+                                                                      @RequestParam(required = false) Long classId,
                                                                       @RequestParam(defaultValue = "en") String lang) {
+        testService.getTestById(testId, classId, lang);
         List<Question> questions = questionService.getQuestionsByTestId(testId, lang);
         List<QuestionResponse> response = questions.stream().map(this::toQuestionResponse).toList();
         return ResponseEntity.ok(response);
@@ -92,6 +103,8 @@ public class TestController {
                 .mode(test.getMode() == null ? null : test.getMode().name())
                 .difficulty(test.getDifficulty() == null ? null : test.getDifficulty().name())
                 .testType(test.getTestType() == null ? null : test.getTestType().name())
+                .classId(test.getEducationClass() == null ? null : test.getEducationClass().getId())
+                .className(test.getEducationClass() == null ? null : test.getEducationClass().getName())
                 .build();
     }
 
